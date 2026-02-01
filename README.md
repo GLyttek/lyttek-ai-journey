@@ -1,0 +1,101 @@
+# Lyttek AI Journey
+
+**Building an AI-powered automation system with Claude Code**
+
+This repository documents our journey of building a comprehensive AI automation system for Lyttek GmbH, a German AI consulting company. Started in late 2025, this project explores how to build practical, secure, and cost-effective AI agent systems.
+
+## What We're Building
+
+A hierarchical AI agent system that:
+- **Collects information autonomously** using cheap local models (Docker)
+- **Synthesizes findings** using cloud models (OpenRouter)
+- **Presents for human approval** - AI proposes, human disposes
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    HIERARCHICAL AGENT SYSTEM                     │
+├─────────────────────────────────────────────────────────────────┤
+│  CEO (Human)        │  Final approval, strategic decisions      │
+│  ─────────────────  │  ─────────────────────────────────────── │
+│  Team Leads (Cloud) │  Synthesis, quality control (OpenRouter)  │
+│  ─────────────────  │  ─────────────────────────────────────── │
+│  Collectors (Local) │  Data gathering, 24/7 monitoring (Docker) │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+## Key Principles
+
+1. **Human-in-the-loop**: AI assists, human decides
+2. **Cost optimization**: Local models for bulk work, cloud for quality
+3. **Security first**: GOTCHA framework, prompt injection protection
+4. **Practical over perfect**: Working systems over elegant theories
+
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [01 - Genesis](docs/01_genesis.md) | How it all started with Claude Code |
+| [02 - First Automation](docs/02_first_automation.md) | Building the first workers |
+| [03 - Security Evolution](docs/03_security_evolution.md) | Learning from OpenClaw, implementing GOTCHA |
+| [04 - Multi-Agent Architecture](docs/04_multi_agent.md) | Hierarchical agents with local models |
+| [05 - Lessons Learned](docs/05_lessons_learned.md) | What worked, what didn't |
+
+## Architecture Overview
+
+### Components
+
+- **Content Pipeline**: YouTube analysis, webpage processing, content curation
+- **Research System**: Automated research queries, knowledge gap detection
+- **Writer System**: Content generation with quality thresholds
+- **Security Layer**: PromptShield, cost tracking, audit logging
+- **Collector Agents**: Topic-specific data gatherers (local Docker models)
+
+### Tech Stack
+
+- **Primary Interface**: Claude Code CLI
+- **Cloud Models**: OpenRouter (Mistral, Gemini, Grok)
+- **Local Models**: Docker Model Runner (gemma3, ministral3)
+- **Knowledge Base**: Obsidian Markdown files
+- **Scheduling**: Cron jobs + continuous watchers
+
+## Code Examples
+
+See the [examples/](examples/) directory for sanitized code snippets:
+- `prompt_shield_example.py` - Input sanitization
+- `collector_example.py` - Local model data collection
+- `quality_routing_example.py` - Cloud model synthesis
+
+## Why Open Source This?
+
+1. **Transparency**: Show real-world AI agent development, not just theory
+2. **Learning**: Document mistakes and solutions for others
+3. **Community**: Contribute to the growing AI agent ecosystem
+4. **Marketing**: Demonstrate Lyttek's AI consulting capabilities
+
+## Timeline
+
+| Date | Milestone |
+|------|-----------|
+| 2025-10 | Project started with Claude Code |
+| 2025-11 | First content automation workers |
+| 2025-12 | Knowledge management system |
+| 2026-01 | Security hardening (GOTCHA framework) |
+| 2026-02 | Hierarchical agent architecture |
+
+## Influenced By
+
+- [David Shapiro's ACE Framework](https://github.com/daveshap/ACE_Framework)
+- [OpenAI Agent Swarm (HAAS)](https://github.com/daveshap/OpenAI_Agent_Swarm)
+- [GOTCHA Security Framework](https://www.youtube.com/watch?v=nO85yBWrFHY)
+
+## License
+
+MIT License - See [LICENSE](LICENSE)
+
+## About Lyttek GmbH
+
+Lyttek is a German AI consulting company helping businesses implement practical AI solutions. We believe in AI that augments human capabilities, not replaces them.
+
+---
+
+*This documentation is auto-generated and manually curated. Last update: 2026-02-01*
