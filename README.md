@@ -37,11 +37,16 @@ A hierarchical AI agent system that:
 
 | Document | Description |
 |----------|-------------|
+| [00 - Prequel: Early Experiments](docs/00_prequel_experiments.md) | August 2024 learning projects that laid the foundation |
 | [01 - Genesis](docs/01_genesis.md) | How it all started with Claude Code |
 | [02 - First Automation](docs/02_first_automation.md) | Building the first workers |
 | [03 - Security Evolution](docs/03_security_evolution.md) | Learning from OpenClaw, implementing GOTCHA |
 | [04 - Multi-Agent Architecture](docs/04_multi_agent.md) | Hierarchical agents with local models |
 | [05 - Lessons Learned](docs/05_lessons_learned.md) | What worked, what didn't |
+
+### Related Repositories
+
+- **[myscripts](https://github.com/GLyttek/myscripts)** - Python AI utilities and cleaned-up experiments
 
 ## Architecture Overview
 
