@@ -43,6 +43,12 @@ A hierarchical AI agent system that:
 | [03 - Security Evolution](docs/03_security_evolution.md) | Learning from OpenClaw, implementing GOTCHA |
 | [04 - Multi-Agent Architecture](docs/04_multi_agent.md) | Hierarchical agents with local models |
 | [05 - Lessons Learned](docs/05_lessons_learned.md) | What worked, what didn't |
+| [06 - AI Agents Training](docs/06_ai_agents_training.md) | Building reliable agents in 2026 |
+
+### Training Materials
+
+- **[AI Agents Workshop](workshops/AI_Agents_Workshop_Outline.md)** - Half/full-day workshop outline
+- **[Training Video](https://youtu.be/64qeuW15J8g)** - Full presentation on YouTube
 
 ### Related Repositories
 
