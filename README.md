@@ -1,8 +1,10 @@
 # Lyttek AI Journey
 
-**Building an AI-powered automation system with Claude Code**
+**A Proof-of-Concept for AI-Human Partnership in Business**
 
-This repository documents our journey of building a comprehensive AI automation system for Lyttek GmbH, a German AI consulting company. Started in late 2025, this project explores how to build practical, secure, and cost-effective AI agent systems.
+> *"The future isn't 'human in the loop' – it's AI hand in hand with Human."*
+
+This repository documents our journey of building a comprehensive AI automation system as a **POC for an AI-partnered company**. Started in late 2025, this project explores how AI and humans can work together as true partners, not just tools and operators.
 
 ## What We're Building
 
@@ -25,10 +27,11 @@ A hierarchical AI agent system that:
 
 ## Key Principles
 
-1. **Human-in-the-loop**: AI assists, human decides
+1. **AI-Human Partnership**: Not "human in the loop" but genuine collaboration
 2. **Cost optimization**: Local models for bulk work, cloud for quality
 3. **Security first**: GOTCHA framework, prompt injection protection
 4. **Practical over perfect**: Working systems over elegant theories
+5. **Learning together**: Both AI and human grow from each interaction
 
 ## Documentation
 
