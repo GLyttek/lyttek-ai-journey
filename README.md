@@ -49,6 +49,13 @@ A hierarchical AI agent system that:
 
 - **[AI Agents Workshop](workshops/AI_Agents_Workshop_Outline.md)** - Half/full-day workshop outline
 - **[Training Video](https://youtu.be/64qeuW15J8g)** - Full presentation on YouTube
+- **[Training Slides](presentations/AI%20Agents%20Training%20%20Accelerating%20Agent%20Use%20in%202026.pptx)** - PowerPoint presentation
+
+### Research & Whitepapers
+
+| Paper | Year | Topic | Status |
+|-------|------|-------|--------|
+| [1.58-bit LLMs](whitepapers/Redefining%20Efficiency%20in%20AI%20The%20Impact%20of%201.58-bit%20LLMs%20on%20the%20Future%20of%20Computing.pdf) | 2024 | BitNet b1.58, ultra-low-bit quantization | [2026 Retrospective](whitepapers/1_58_bit_llm_retrospective_2026.md) |
 
 ### Related Repositories
 
@@ -112,4 +119,4 @@ Lyttek is a German AI consulting company helping businesses implement practical 
 
 ---
 
-*This documentation is auto-generated and manually curated. Last update: 2026-02-01*
+*This documentation is auto-generated and manually curated. Last update: 2026-02-02*
