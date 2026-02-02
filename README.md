@@ -44,6 +44,8 @@ A hierarchical AI agent system that:
 | [04 - Multi-Agent Architecture](docs/04_multi_agent.md) | Hierarchical agents with local models |
 | [05 - Lessons Learned](docs/05_lessons_learned.md) | What worked, what didn't |
 | [06 - AI Agents Training](docs/06_ai_agents_training.md) | Building reliable agents in 2026 |
+| [07 - ACE Framework Exploration](docs/07_ace_framework_exploration.md) | David Shapiro's layered agent architecture |
+| [08 - Early LLM Patterns](docs/08_early_llm_patterns.md) | Chain prompting, RAG, ReAct patterns |
 
 ### Training Materials
 
