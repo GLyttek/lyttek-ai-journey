@@ -109,7 +109,7 @@ See the [examples/](examples/) directory for sanitized code snippets:
 
 - [David Shapiro's ACE Framework](https://github.com/daveshap/ACE_Framework)
 - [OpenAI Agent Swarm (HAAS)](https://github.com/daveshap/OpenAI_Agent_Swarm)
-- [GOTCHA Security Framework](https://www.youtube.com/watch?v=nO85yBWrFHY)
+- [GATO Framework](https://github.com/daveshap/GATO_Framework)
 
 ## License
 
