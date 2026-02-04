@@ -46,6 +46,7 @@ A hierarchical AI agent system that:
 | [06 - AI Agents Training](docs/06_ai_agents_training.md) | Building reliable agents in 2026 |
 | [07 - ACE Framework Exploration](docs/07_ace_framework_exploration.md) | David Shapiro's layered agent architecture |
 | [08 - Early LLM Patterns](docs/08_early_llm_patterns.md) | Chain prompting, RAG, ReAct patterns |
+| [09 - Aletheia: From Automation to Reflection](docs/09_aletheia_local_agent.md) | Building a local personality-driven agent with autonomy |
 
 ### Training Materials
 
@@ -72,6 +73,7 @@ A hierarchical AI agent system that:
 - **Writer System**: Content generation with quality thresholds
 - **Security Layer**: PromptShield, cost tracking, audit logging
 - **Collector Agents**: Topic-specific data gatherers (local Docker models)
+- **Aletheia**: Local personality-driven agent with autonomy and Obsidian integration
 
 ### Tech Stack
 
@@ -104,6 +106,7 @@ See the [examples/](examples/) directory for sanitized code snippets:
 | 2025-12 | Knowledge management system |
 | 2026-01 | Security hardening (GOTCHA framework) |
 | 2026-02 | Hierarchical agent architecture |
+| 2026-02 | Aletheia: local personality-driven agent |
 
 ## Influenced By
 
@@ -121,4 +124,4 @@ Lyttek is a German AI consulting company helping businesses implement practical 
 
 ---
 
-*This documentation is auto-generated and manually curated. Last update: 2026-02-02*
+*This documentation is auto-generated and manually curated. Last update: 2026-02-04*
