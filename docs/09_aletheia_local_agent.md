@@ -96,6 +96,99 @@ The fixes were applied in a single pass: system prompt separation, CORS restrict
 
 The audit reinforced a lesson from earlier chapters: building fast is good, but auditing immediately after is essential. The XSS vulnerability alone could have allowed any browser tab to inject JavaScript into the task list.
 
+## The Command Center Upgrade (February 2026)
+
+A week after the initial build, a critical realization: Aletheia was isolated. It could chat and reflect, but it had no awareness of what was actually happening in the workspace. The production workers were running in separate processes. CEO approvals were piling up in a folder. Content queues were filling without visibility.
+
+The solution was to transform Aletheia from a chatbot into a **Command Center** — a unified interface for controlling the entire automation stack.
+
+### Integration with Production Controllers
+
+The existing production system already had well-tested controllers:
+- `WorkerController` — manages 8 worker processes via PID files
+- `CEOController` — handles the approval queue (pending → approved/rejected)
+- `COOController` — monitors system health (Docker, API keys, disk space)
+
+Rather than rebuilding these, Aletheia imports them directly and exposes their functionality through new endpoints. This means the same code that powers the production dashboard now powers Aletheia's command center.
+
+### New Capabilities
+
+**Worker Management:**
+```
+┌─────────────────────────────────────────┐
+│  Workers (3/8 aktiv)                    │
+├─────────────────────────────────────────┤
+│  ● email_worker       [Stop] [Logs]     │
+│  ● content_worker     [Stop] [Logs]     │
+│  ○ research_worker    [Start]           │
+│  ● writer_worker      [Stop] [Logs]     │
+│  ...                                    │
+│  [Alle starten] [Alle stoppen]          │
+└─────────────────────────────────────────┘
+```
+
+Every worker can be started, stopped, or restarted directly from the UI or via chat commands (`/start email_worker`, `/stop content_worker`). Logs are viewable inline. The status is live — no page refresh needed.
+
+**CEO Approval Queue:**
+```
+┌─────────────────────────────────────────┐
+│  CEO Approvals (5 pending)              │
+├─────────────────────────────────────────┤
+│  SECURITY_BRIEFING_2026-02-05.md        │
+│  [✓ OK] [✗ Ablehnen] [Vorschau]         │
+│                                         │
+│  WEBPAGE_ANALYSIS_github_2026-02-04.md  │
+│  [✓ OK] [✗ Ablehnen] [Vorschau]         │
+└─────────────────────────────────────────┘
+```
+
+Pending approvals from `00_CEO/Pending_Approval/` are listed with quick actions. The preview shows the first 2000 characters plus an **AI opinion** — Aletheia reads the document and provides a recommendation (approve/reject/review) with brief rationale. This transforms approval from "read everything" to "review AI assessment, then decide."
+
+**Queue Monitoring:**
+- **Content Queue** — pending YouTube/webpage URLs with an input field to add new URLs directly
+- **Research Queue** — open RQ files waiting for Perplexity processing
+
+**System Health:**
+- Docker status, API key validity, disk space, action queue depth
+- Visual indicators: ✓ OK / ⚠ Warning / ✗ Critical
+
+**Activity Feed:**
+Real-time event log showing worker starts/stops, approvals, autonomy ticks, and chat messages. The feed polls every 5 seconds and auto-scrolls to newest events.
+
+### The Action-First Principle
+
+The most significant change was behavioral, not technical. The original system prompt encouraged Aletheia to ask clarifying questions. This created friction — every request required multiple round-trips.
+
+The new principle: **Default reaction is ACTION, not QUESTIONS.**
+
+```
+Before: "Soll ich den Worker starten?"
+After:  "Ich starte den Worker." [Worker gestartet]
+
+Before: "Möchtest Du, dass ich eine Analyse erstelle?"
+After:  "Ich erstelle die Analyse." [Dokument gespeichert]
+```
+
+Exceptions are explicit: destructive actions (deleting, rejecting), unclear CEO-level decisions (budget, strategy), and contradictory requirements. For everything else, Aletheia acts immediately and confirms briefly.
+
+### Workspace-Aware Autonomy
+
+The autonomy loop was upgraded to understand real workspace state. Every tick now includes:
+
+```
+WORKSPACE STATUS:
+WORKERS: 3/8 aktiv
+  Gestoppt: research_worker, writer_worker, action_executor
+CEO APPROVALS: 5 ausstehend
+  Neueste: SECURITY_BRIEFING_2026-02-05.md
+CONTENT QUEUE: 12 URLs wartend
+RESEARCH QUEUE: 3 offene RQs
+```
+
+This context is injected into both the autonomy prompt and every chat message. Reflections are now about actual workspace conditions, not just conversation echoes. The agent can notice "Research worker is stopped but there are pending RQs" and flag it.
+
+Health monitoring runs every other autonomy tick, checking if critical workers (`content_queue_watcher`, `action_executor`, `coo_secretary`) are stopped. Alerts appear in the activity feed.
+
 ## What Works and What Doesn't
 
 **Works well:**
@@ -103,25 +196,30 @@ The audit reinforced a lesson from earlier chapters: building fast is good, but 
 - The Obsidian integration is seamless — files appear instantly in the vault and are immediately usable.
 - The autonomy reflections accumulate into a useful thinking trail.
 - The model fallback chain handles provider outages transparently.
+- ✓ **NEW:** Command center provides full visibility into worker status, queues, and approvals.
+- ✓ **NEW:** Vault search allows referencing existing documents in conversations.
+- ✓ **NEW:** AI opinion on approvals reduces review time significantly.
+- ✓ **NEW:** Action-first behavior eliminates unnecessary confirmation dialogs.
 
 **Doesn't work yet:**
-- The agent has no access to the vault's existing knowledge. It cannot search, read, or reference previous documents. Every conversation starts from zero.
-- Memory is manual and overwrites on each save. There is no consolidation or pattern recognition across sessions.
-- The autonomy loop is stimulus-response, not planning. It reacts to recent context but cannot set its own agenda.
-- Worker tasks run synchronously from the user's perspective — there is no queue, no progress feedback, no parallel execution.
+- ~~The agent has no access to the vault's existing knowledge.~~ ✓ Basic vault search implemented.
+- ~~Memory is manual and overwrites on each save.~~ ✓ Memory consolidation via LLM now merges patterns.
+- The autonomy loop is workspace-aware but still reactive. It monitors and alerts but doesn't auto-restart workers.
+- No external tools yet (web browsing, calendar, email APIs).
+- No multi-user access control — local only.
 
 ## What Comes Next
 
-The roadmap draws from patterns observed in the broader open-source agent ecosystem:
+The roadmap has evolved based on what was actually needed:
 
-1. **Skills as modules** — instead of hardcoded capabilities, define each tool (vault search, web fetch, file operations) as a pluggable function that the agent can invoke.
-2. **Sandboxed execution** — run worker tasks inside Docker containers so that even poorly-behaved model outputs cannot affect the host system.
-3. **Gateway abstraction** — decouple the messaging interface from the core logic so the same agent can be reached via the browser, Telegram, or other platforms.
-4. **Streaming responses** — replace the current request-response pattern with server-sent events for progressive display.
-5. **Persistent conversation history** — move from in-memory state to JSONL or SQLite so that context survives restarts.
-6. **Vault search** — a ripgrep-based tool that lets the agent search and reference existing documents, enabling genuine RAG over the Obsidian vault.
-
-The most significant gap is item 6. An agent that cannot access its own knowledge base is fundamentally limited. Once vault search is in place, the autonomy loop can shift from "reflect on recent chat" to "connect recent chat with existing knowledge" — which is where the real value lies.
+1. ~~**Vault search**~~ ✓ Implemented — basic glob + text matching, future: ripgrep with ranking.
+2. ~~**Persistent conversation history**~~ ✓ Implemented — JSONL storage survives restarts.
+3. **Skills as modules** — modular capabilities (web browsing, shell exec) as pluggable functions.
+4. **Sandboxed execution** — Docker containers for task execution.
+5. **Gateway abstraction** — Telegram, Discord integration.
+6. **Streaming responses** — SSE for progressive display.
+7. **Automated scheduling** — cron-like execution without manual triggers.
+8. **Full autonomy** — self-initiated actions based on workspace state (restart stopped workers, process urgent items).
 
 ## The Bigger Picture
 
