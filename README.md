@@ -47,6 +47,8 @@ A hierarchical AI agent system that:
 | [07 - ACE Framework Exploration](docs/07_ace_framework_exploration.md) | David Shapiro's layered agent architecture |
 | [08 - Early LLM Patterns](docs/08_early_llm_patterns.md) | Chain prompting, RAG, ReAct patterns |
 | [09 - Aletheia: From Automation to Reflection](docs/09_aletheia_local_agent.md) | Building a local personality-driven agent with autonomy |
+| [10 - Novaterra Story Engine](docs/10_novaterra_story_engine.md) | From book project to multi-model story generation |
+| [11 - Production Reality Check](docs/11_production_reality_check.md) | Infrastructure hardening, PDCA methodology, and saying no |
 
 ### Training Materials
 
@@ -73,15 +75,15 @@ A hierarchical AI agent system that:
 - **Writer System**: Content generation with quality thresholds
 - **Security Layer**: PromptShield, cost tracking, audit logging
 - **Collector Agents**: Topic-specific data gatherers (local Docker models)
-- **Aletheia**: Local personality-driven agent with autonomy and Obsidian integration
+- **Aletheia**: AI Command Center (FastAPI + Web UI) with worker management, CEO approvals, and content routing
 
 ### Tech Stack
 
 - **Primary Interface**: Claude Code CLI
-- **Cloud Models**: OpenRouter (Mistral, Gemini, Grok)
-- **Local Models**: Docker Model Runner (gemma3, ministral3)
-- **Knowledge Base**: Obsidian Markdown files
-- **Scheduling**: Cron jobs + continuous watchers
+- **Cloud Models**: OpenRouter (DeepSeek, Gemini, Grok)
+- **Local Models**: Docker Model Runner (gemma3)
+- **Knowledge Base**: Obsidian Markdown + ChromaDB (195k chunks)
+- **Scheduling**: Cron jobs + continuous watchers + FastAPI dashboard
 
 ## Code Examples
 
@@ -107,6 +109,8 @@ See the [examples/](examples/) directory for sanitized code snippets:
 | 2026-01 | Security hardening (GOTCHA framework) |
 | 2026-02 | Hierarchical agent architecture |
 | 2026-02 | Aletheia: local personality-driven agent |
+| 2026-02 | Novaterra: AI-powered story generation engine |
+| 2026-02 | Production hardening: PDCA-verified content pipeline |
 
 ## Influenced By
 
@@ -124,4 +128,4 @@ Lyttek is a German AI consulting company helping businesses implement practical 
 
 ---
 
-*This documentation is auto-generated and manually curated. Last update: 2026-02-04*
+*This documentation is auto-generated and manually curated. Last update: 2026-02-19*
