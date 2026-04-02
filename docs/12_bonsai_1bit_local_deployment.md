@@ -185,7 +185,7 @@ generation:  108 tokens/sec
 
 108 tokens per second generation. On a mid-range consumer GPU, from a 1-gigabyte model.
 
-The user's reaction was accurate: *"It is alive!! Muwhahahah... und unglaublich schnell."*
+My reaction, after all that was : *"It is alive!!"*
 
 ## Honest Model Evaluation
 
@@ -217,7 +217,7 @@ The hypothesis: previous turns in the conversation introduce noise that competes
 
 Practical implication: **for analytical tasks, use fresh threads**. For conversational tasks where context is the point, the effect is less pronounced. This mirrors a known pattern in cloud LLM usage but becomes more visible when you can measure it directly against a fixed local model.
 
-**Verdict**: Bonsai-8B is the first genuinely deployable 1-bit model. It's excellent at language tasks, solid at document analysis, and weak at arithmetic. For a model that fits in 1 GiB and runs at 108 tok/s on a mid-range GPU, those tradeoffs are entirely reasonable. It's not a replacement for GPT-4 or Claude. It's a new category: a **fast, private, local model for language-intensive tasks** that runs on hardware most people already own.
+**Verdict**: Bonsai-8B is the first genuinely deployable 1-bit model. It's excellent at language tasks, solid at document analysis, and weak at arithmetic. For a model that fits in 1 GiB and runs at 108 tok/s on a mid-range GPU, those tradeoffs are entirely reasonable. It's not a replacement for Chat GPT or Claude. It's a new category: a **fast, private, local model for language-intensive tasks** that runs on hardware most people already own.
 
 ## The Docker Setup (Reproducible)
 
