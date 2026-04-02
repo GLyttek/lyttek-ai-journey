@@ -95,11 +95,11 @@ Our 2024 prediction: *"Dedicated inference hardware will emerge."*
 
 ### 3. Quality-at-Any-Cost Persisted Longer
 
-**Our 2024 expectation:** Efficiency would rapidly overtake quality as the priority.
+**My 2024 expectation:** Efficiency would rapidly overtake quality as the priority.
 
 **Reality 2026:** Frontier labs continued the "scale up" approach:
-- GPT-5 remained FP16/BF16 at training time
-- Claude 4 prioritized capability over efficiency
+- GPT remained FP16/BF16 at training time
+- Claude prioritized capability over efficiency
 - Only inference got quantization treatment
 - The quality gap between 4-bit inference and FP16 training narrowed enough that training innovation continued at full precision
 
