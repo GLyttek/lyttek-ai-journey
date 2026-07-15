@@ -13,7 +13,7 @@ The production workspace itself is **not published here**. This is a documentati
 - New to the project: read [01 - Genesis](docs/01_genesis.md), [05 - Lessons Learned](docs/05_lessons_learned.md), and [11 - Production Reality Check](docs/11_production_reality_check.md).
 - Interested in the current agent direction: read [09 - Aletheia](docs/09_aletheia_local_agent.md).
 - Interested in local inference and AMD ROCm: read [12 - Bonsai 1-bit Local Deployment](docs/12_bonsai_1bit_local_deployment.md).
-- Interested in training material: see the [workshop](workshops/AI_Agents_Workshop_Outline.md) and presentation below.
+- Interested in training material: see the [workshop](workshops/AI_Agents_Workshop_Outline.md) and training video below.
 
 ## Repository Scope
 
@@ -110,7 +110,8 @@ The diagrams and code excerpts describe the system at specific points in time. T
 
 - **[AI Agents Workshop](workshops/AI_Agents_Workshop_Outline.md)** — half-day and full-day workshop outline
 - **[Training Video](https://youtu.be/64qeuW15J8g)** — presentation on YouTube
-- **[Training Slides](presentations/AI%20Agents%20Training%20%20Accelerating%20Agent%20Use%20in%202026.pptx)** — PowerPoint source; large binary asset
+
+The editable slide source is retained privately rather than versioned as a large binary asset. Its claims and references need a fresh review before a future, accessible HTML edition is considered for [lyttek.org](https://lyttek.org).
 
 ## Research and Whitepapers
 
