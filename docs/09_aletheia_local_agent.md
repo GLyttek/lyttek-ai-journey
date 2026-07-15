@@ -2,6 +2,8 @@
 
 *February 2026*
 
+> **Status:** Historical architecture snapshot. The current Aletheia/Hermes environment has evolved beyond the implementation described here.
+
 ## The Question That Changed Direction
 
 After months of building task-oriented automation — collectors that gather, team leads that route, workers that process — a different question emerged: what if an AI agent wasn't just a worker, but a thinking companion?
@@ -90,7 +92,7 @@ The worker system is deliberately simple — no orchestration, no scheduling, no
 
 After the initial build, a thorough code audit revealed the kind of issues that MVPs typically accumulate. The most impactful finding was architectural: the system prompt was being sent as part of the user message rather than as the dedicated system role. This meant the LLM was treating Aletheia's entire personality definition as user input, which significantly degraded prompt adherence and opened the door to prompt injection.
 
-Other findings included an XSS vulnerability in the task list (innerHTML with unsanitized filenames), a CORS configuration that allowed any website to make authenticated requests, regex patterns that didn't match what they intended to match, and unbounded message history that would eventually consume all available memory.
+Other findings included an XSS vulnerability in the task list (`innerHTML` with untrusted filenames), a CORS configuration that allowed arbitrary websites to send browser requests to the local service, regex patterns that didn't match what they intended to match, and unbounded message history that would eventually consume all available memory.
 
 The fixes were applied in a single pass: system prompt separation, CORS restriction to localhost, DOM API instead of innerHTML, thread safety via locks, async LLM calls to avoid blocking the event loop, message history capping, and YAML escaping for frontmatter values. The UI also received quality-of-life improvements — a loading indicator during LLM calls, toast notifications for save operations, Enter-to-send, and error handling for all network requests.
 

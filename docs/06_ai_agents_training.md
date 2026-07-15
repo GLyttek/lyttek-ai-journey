@@ -2,13 +2,15 @@
 
 *Building Reliable, Trustworthy, and Effective AI Agents*
 
+> **Status:** Training snapshot from February 2026, revised in July 2026 to correct overly strong reliability and regulatory claims. It is not legal advice.
+
 > **Video:** [Watch the full training on YouTube](https://youtu.be/64qeuW15J8g)
 
 ## Overview
 
-This training addresses two critical challenges every organization faces when deploying AI agents:
+This training addresses two recurring challenges when organizations deploy AI agents:
 
-1. **The Reliability Challenge** - How to eliminate hallucinations
+1. **The Reliability Challenge** - How to reduce, detect, and contain unsupported output
 2. **The Intent Gap** - How to bridge human intent and AI interpretation
 
 ## The Five Pillars of Agent Reliability
@@ -21,7 +23,7 @@ Ground AI responses in verified facts by providing an external "cheatsheet."
 User Query → Retrieve Relevant Docs → Generate from Context → Cite Sources
 ```
 
-**Key Insight:** RAG grounds the *input*, preventing hallucinations at the source.
+**Key Insight:** RAG can ground the *input* in selected sources. It does not guarantee that retrieval is complete or that the generated answer is faithful to the retrieved text.
 
 ### 2. Chain of Verification
 
@@ -38,23 +40,23 @@ Trust, but verify - validate AI output after generation.
 
 ### 3. Self-Consistency
 
-If an AI produces the same answer multiple times, it's more likely correct.
+If independent samples converge, that can increase confidence for some reasoning tasks. Repetition is not proof: models can reproduce the same shared error.
 
 - Run the same prompt 3-5 times
 - Collect all responses
 - Identify consensus
 
-**Trade-off:** Higher latency and cost, but significantly improved reliability.
+**Trade-off:** Higher latency and cost. The benefit must be measured for the task instead of assumed.
 
-### 4. LLM Council (Distributed Intelligence)
+### 4. LLM Council (Model Diversity)
 
-Multiple models cross-check each other's reasoning.
+Multiple models can review the same output, but model count alone does not create independence. Select models and prompts through task-specific evaluation rather than fixed personality stereotypes.
 
-| Model | Personality | Best For |
-|-------|-------------|----------|
-| Gemini | Creative | Brainstorming |
-| ChatGPT | Methodical | Documentation |
-| Claude | Conservative | Compliance |
+| Review role | Purpose | Evidence needed |
+|-------------|---------|-----------------|
+| Generator | Produce the candidate answer | Task success criteria |
+| Critic | Identify unsupported or unsafe claims | Specific citations or test failures |
+| Adjudicator | Resolve disagreements | Defined rubric and escalation rule |
 
 ### 5. Layered Integration
 
@@ -91,9 +93,9 @@ RAG (Foundation) → Chain of Verification → Self-Consistency → LLM Council 
 |-------|-------------|----------|
 | 1 | Human validates all | Current |
 | 2 | Hybrid (AI flags issues) | Now |
-| 3 | AI validates AI | 2026-2027 |
-| 4 | Autonomous validation | 2028+ |
-| 5 | Self-correcting systems | 2029+ |
+| 3 | AI-assisted validation with measured human escalation | Target state |
+| 4 | Bounded automated validation for low-consequence cases | Conditional on evidence |
+| 5 | Continuously evaluated and corrected workflows | Long-term direction, not a forecast |
 
 ---
 
@@ -103,9 +105,11 @@ RAG (Foundation) → Chain of Verification → Self-Consistency → LLM Council 
 
 | Risk Level | Oversight | Examples |
 |------------|-----------|----------|
-| High | Explicit Approval | Delete, send money |
-| Medium | Review & Edit | Draft emails, code |
-| Low | Autonomous | Search, summarize |
+| High | Explicit approval and strong authentication | Delete, publish, transfer funds, change access |
+| Medium | Review, test, and edit before effect | Draft emails, code changes, configuration |
+| Low | Bounded automation with logging | Read-only search over approved sources |
+
+Risk depends on data sensitivity, permissions, reversibility, and downstream effect. “Summarize” is not automatically low risk when the input or destination is sensitive.
 
 ### Agent Security Threats
 
@@ -122,21 +126,23 @@ RAG (Foundation) → Chain of Verification → Self-Consistency → LLM Council 
 
 ## EU Regulatory Compliance
 
-Four frameworks to consider:
+Four frameworks to consider. Applicability depends on role, sector, system purpose, and jurisdiction:
 
 | Framework | Focus | Timeline |
 |-----------|-------|----------|
-| EU AI Act | Risk-based regulation | Aug 2026 |
+| EU AI Act | Risk-based regulation | Phased application; most provisions apply from 2 Aug 2026 |
 | GDPR | Data protection | Active |
-| NIS2 | Cybersecurity | Jan 2025 |
-| DORA | Financial resilience | Jan 2025 |
+| NIS2 | Cybersecurity | EU transposition deadline was 17 Oct 2024; national implementation varies |
+| DORA | Financial resilience | Applied from 17 Jan 2025 |
 
 ### EU AI Act Risk Levels
 
 - **Prohibited:** Social scoring, manipulative AI
-- **High-Risk:** Recruitment, credit, education (8 mandatory controls)
+- **High-Risk:** Includes specified uses in employment, credit, and education; obligations depend on the system and operator role
 - **Limited-Risk:** Chatbots (user notification)
-- **Minimal-Risk:** Spam filters (no requirements)
+- **Minimal-Risk:** Systems outside the prohibited, high-risk, or transparency categories; other applicable law still applies
+
+Primary reference: [European Commission — AI Act](https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai). This section is an operational overview, not legal advice.
 
 ---
 
@@ -173,11 +179,11 @@ Level 4: Compounding & Leverage
 
 ## Key Takeaways
 
-1. **Hallucination isn't the enemy** - lack of validation is
+1. **Unsupported output cannot be eliminated by one technique** - validation and consequence limits matter
 2. **Intent must be explicit** - use living requirements
 3. **Friction is a feature** - match oversight to risk
-4. **AI validates AI** - humans validate validators
-5. **2026 is the Year of the Agent** - prepare now
+4. **AI can assist validation** - humans remain accountable for the validation design and escalation boundary
+5. **Agent adoption increases the need for explicit authority and evidence**
 
 ---
 
