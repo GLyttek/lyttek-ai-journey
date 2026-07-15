@@ -1,36 +1,40 @@
-# 12. One Bit to Rule Them All: Running the World's Most Efficient LLM Locally
+# 12. Running a 1-Bit LLM Locally on AMD ROCm
 
-*April 2026 — AMD ROCm, Docker, proprietary quantization, and 108 tokens per second from a 1-gigabyte model*
+*April 2026 — AMD ROCm, Docker, a custom non-mainline quantization format, and a local 108 tokens-per-second observation*
+
+> **Status:** Single-machine deployment case study. Performance and quality statements are local observations unless an external source is linked; they are not independent model benchmarks.
 
 ---
 
 ## The Paper That Started It
 
-In early 2024, a research paper made the rounds that felt almost too good to be true: 1-bit Large Language Models. The idea was to reduce transformer weights not to 8-bit integers, not to 4-bit integers, but to a single bit — values of -1, 0, or +1. The BitNet b1.58 paper from Microsoft Research showed that a transformer trained from scratch at 1.58 bits per weight could match full-precision models at equivalent parameter counts, while requiring dramatically less memory and compute.
+In early 2024, [BitNet b1.58](https://arxiv.org/abs/2402.17764) made the rounds and felt almost too good to be true. Its ternary weights use `-1`, `0`, and `+1`, corresponding to an information density of about 1.58 bits per weight. The paper reported that models trained with this approach could approach full-precision performance at comparable parameter counts while reducing memory and arithmetic costs.
 
-The AI community was divided. Skeptics pointed out that the models had to be trained natively in 1-bit — you couldn't quantize an existing model down to 1 bit without catastrophic quality loss. True. But the training-time efficiency gains were real, and the inference-time implications were staggering: a 1-bit model would fit in less than 20% of the memory required for its FP16 equivalent.
+The approach differed from ordinary post-training quantization: the BitNet result depended on training for ternary weights rather than simply converting an existing FP16 checkpoint. The paper reported substantial memory and arithmetic advantages; practical gains still depended on model quality, kernels, and hardware support.
 
-For a while, this remained an academic curiosity. There were no production-grade 1-bit models you could actually run.
+For a while, I had not found a 1-bit model and inference path that I could deploy on this hardware.
 
 Then PrismML shipped Bonsai.
 
 ## PrismML and the Q1_0_g128 Format
 
-PrismML is a small company that took the 1.5-bit research and turned it into deployable models. Their Bonsai series runs on a custom quantization format called `Q1_0_g128`:
+PrismML took low-bit research into a deployable model and inference implementation. Their Bonsai series uses a custom, non-mainline format called `Q1_0_g128`:
 
 - Every 128 weights share a single FP16 scale factor
-- The weights themselves are stored as 1-bit values
+- Each binary weight selects `-scale` or `+scale`
 - Result: **1.125 bits per weight average**, with the scale factors providing just enough precision for coherent outputs
+
+External references: [Bonsai-8B model card](https://huggingface.co/prism-ml/Bonsai-8B-gguf) and [PrismML llama.cpp fork](https://github.com/PrismML-Eng/llama.cpp).
 
 Bonsai-8B — an 8.19 billion parameter model based on the Qwen3 architecture — compresses to **1.07 GiB**. For comparison, the same model in standard 4-bit quantization (Q4_K_M) would be roughly 5 GiB. In FP16, about 16 GiB.
 
 One gigabyte. For an 8B parameter model.
 
-The catch: Q1_0_g128 is proprietary. It's not supported by the standard Ollama distribution, not in the mainline llama.cpp, and not in any off-the-shelf inference runtime. PrismML maintains their own llama.cpp fork with custom dequantization kernels for this format. To run Bonsai locally, you have to build from that fork.
+The catch at the time of this deployment: Q1_0_g128 was not supported by the standard Ollama distribution or mainline llama.cpp. PrismML published a custom llama.cpp fork with the required kernels. “Custom” is the important distinction here; the public model and fork carry open-source licenses, so the original description of the whole stack as proprietary was too broad.
 
 ## Why Not Just Use Ollama
 
-The first instinct was to download the GGUF from HuggingFace and pull it into Ollama. This fails silently.
+The first instinct was to download the GGUF from HuggingFace and pull it into Ollama. In this test, that path failed without a useful user-facing explanation.
 
 Ollama downloads the file, creates a model entry, and appears to load it. When you send a prompt, you get garbage output — or no output at all. Ollama's backend is standard llama.cpp, which encounters the Q1_0_g128 quantization type and either errors out internally or misinterprets the weight layout.
 
@@ -69,9 +73,9 @@ Getting from "plan" to "working container" required fixing five distinct failure
 SQLiteError: unable to open database file
 ```
 
-**Root cause**: The `anythingllm-storage/` directory was created by the host as root (because docker-compose runs as root by default). The AnythingLLM container process ran as a non-root user and couldn't write to a root-owned directory.
+**Root cause**: The bind-mounted `anythingllm-storage/` directory was owned by root on the host, while the AnythingLLM process used a non-root UID and could not write to it.
 
-**Fix**: Add `user: "0:0"` to the anythingllm service in docker-compose. The container runs as root, which eliminates the permission mismatch.
+**Historical workaround**: Add `user: "0:0"` to the AnythingLLM service in Docker Compose. The container then ran as root and bypassed the ownership mismatch.
 
 ```yaml
 anythingllm:
@@ -79,7 +83,7 @@ anythingllm:
   user: "0:0"    # run as root to avoid volume permission issues
 ```
 
-Not elegant, but it works. AnythingLLM's storage is local-only anyway.
+It worked, but it is not the recommended security fix. “Local-only” does not make a root process harmless. A reusable deployment should align the host directory ownership with the image's documented runtime UID, use a correctly owned named volume, or perform a narrow initialization step before dropping privileges.
 
 ### Error 2: hipblas Not Found
 
@@ -105,7 +109,7 @@ After this, cmake found hipblas and the build proceeded.
 
 **Symptom**: The container started, printed a few lines of initialization, then died with exit code 139 (SIGSEGV). The crash happened during slot initialization, before any model was loaded.
 
-**Root cause**: The initial Dockerfile built with `-DAMDGPU_TARGETS=gfx1030`. The RX 6750 XT (Navi 22) is actually `gfx1031`. A binary compiled only for gfx1030 executing on a gfx1031 GPU encounters undefined instruction behavior — which manifests as a segfault.
+**Root-cause assessment**: The initial Dockerfile built only for `gfx1030`, while `rocminfo` reported the RX 6750 XT as `gfx1031`. The target mismatch was the leading explanation for the crash; rebuilding for the reported target removed this failure. The test did not independently isolate the exact failing instruction.
 
 `rocminfo` reports the device as `gfx1031`. The `-DAMDGPU_TARGETS` flag must match the actual hardware, or include it.
 
@@ -126,7 +130,7 @@ rocBLAS error: /opt/rocm/lib/librocblas.so: TensileLibrary.dat: Illegal seek for
 ```
 ...and hung or exited.
 
-**Root cause**: ROCm 7.2.1 ships with a TensileLibrary (pre-compiled matrix multiplication kernels for rocBLAS) that only contains kernels for certain GPU architectures. The RX 6750 XT's `gfx1031` arch is absent — ROCm's Tensile kernel set covers `gfx1030` (RX 6700/6800 series) but not `gfx1031` specifically.
+**Root-cause assessment**: In this ROCm 7.2.1 container, rocBLAS reported that the packaged Tensile library did not contain a usable entry for the detected `gfx1031` target.
 
 The binary was compiled for gfx1031, the runtime found gfx1031 hardware, but then rocBLAS couldn't find matching Tensile kernels.
 
@@ -137,7 +141,7 @@ environment:
   - HSA_OVERRIDE_GFX_VERSION=10.3.0   # gfx1031 → pretend to be gfx1030
 ```
 
-`10.3.0` corresponds to `gfx1030`. This tells the ROCm runtime to use gfx1030's Tensile kernels on gfx1031 hardware. The architectures are nearly identical (both Navi 22 family) — the compute compatibility is real, not a hack.
+`10.3.0` makes the runtime report a `gfx1030` target. This compatibility override worked on the documented RX 6750 XT setup, but it is an unsupported workaround rather than a general guarantee. It should be retested after ROCm, driver, image, or hardware changes.
 
 ### Error 5: Healthcheck Timeout
 
@@ -176,14 +180,14 @@ bonsai-llama    | server listening at http://0.0.0.0:8080
 
 37 out of 37 layers on GPU. 1016 MiB for the model, 1152 MiB for the KV cache. Total GPU usage for a full 8B parameter model: under 2.2 GiB out of 12 GiB available.
 
-The first benchmark came back:
+The first observed run reported:
 
 ```
 prompt eval: 147 tokens/sec
 generation:  108 tokens/sec
 ```
 
-108 tokens per second generation. On a mid-range consumer GPU, from a 1-gigabyte model.
+The server reported 108 tokens per second generation on this RX 6750 XT setup.
 
 My reaction, after all that was : *"It is alive!!"*
 
@@ -195,7 +199,7 @@ My reaction, after all that was : *"It is alive!!"*
 
 **Language and reasoning tasks** are strong. The model explains concepts clearly, maintains context across a conversation, and writes grammatically correct output in both German and English. When asked to reflect on the philosophical implications of 1-bit quantization — whether something is lost when a weight can only be -1, 0, or +1 — it produced a thoughtful, multi-paragraph response about the nature of information compression and the difference between precision and meaning.
 
-**RAG document analysis** was genuinely impressive. We uploaded a 15-page German business document on AI readiness for SMEs. The model summarized the document accurately, extracted the key recommendations, and identified the target audience — all without any prompt engineering. The summary was indistinguishable from what a capable analyst would produce.
+**RAG document analysis** was promising in a small qualitative test. We uploaded a 15-page German business document on AI readiness for SMEs. The model produced a useful summary, extracted recommendations, and identified the intended audience without additional prompt engineering. This was a single author assessment, not a blinded comparison against human analysts.
 
 ### Where It Struggles
 
@@ -203,9 +207,9 @@ My reaction, after all that was : *"It is alive!!"*
 
 The model calculated **3.33 hours**. The correct answer requires noticing that all items dry simultaneously (it's a lateral thinking trick, not a calculation problem). A standard reasoning chain would catch this. Bonsai-8B did not.
 
-It's worth noting: arithmetic was a known weakness of the original BitNet b1.58 research. Single-bit weights appear to capture language patterns and relational reasoning well, but struggle with the precise numerical representations that arithmetic requires.
+One failed lateral-thinking prompt does not establish a general arithmetic limitation or its cause. The result is recorded as a local observation; a defensible capability claim would require a repeatable evaluation set and comparison models.
 
-### The Context Contamination Effect
+### A Context-Contamination Hypothesis
 
 This was the most interesting discovery of the evaluation.
 
@@ -213,13 +217,15 @@ We tested a multi-step math puzzle in a chat thread that had already covered sev
 
 Same model. Same weights. Different context window history.
 
-The hypothesis: previous turns in the conversation introduce noise that competes with the current question during attention computation. The model isn't "confused" — it's responding to a much larger input than you intend when you ask a question in a loaded thread. Clean context produces cleaner reasoning.
+One plausible hypothesis is that previous turns changed the effective task and attention context. The observation does not isolate causality: sampling variation, chat templates, and frontend behavior could also contribute.
 
-Practical implication: **for analytical tasks, use fresh threads**. For conversational tasks where context is the point, the effect is less pronounced. This mirrors a known pattern in cloud LLM usage but becomes more visible when you can measure it directly against a fixed local model.
+Practical recommendation: **prefer fresh contexts for independent analytical tasks**, then evaluate whether this improves results on a repeatable task set. For conversational tasks, continuity may be part of the requirement.
 
-**Verdict**: Bonsai-8B is the first genuinely deployable 1-bit model. It's excellent at language tasks, solid at document analysis, and weak at arithmetic. For a model that fits in 1 GiB and runs at 108 tok/s on a mid-range GPU, those tradeoffs are entirely reasonable. It's not a replacement for Chat GPT or Claude. It's a new category: a **fast, private, local model for language-intensive tasks** that runs on hardware most people already own.
+**Verdict from this test**: Bonsai-8B was deployable on the documented consumer hardware and useful for selected language and document tasks. The test does not establish that it was the first production 1-bit model, that its quality generalizes, or that arithmetic weakness is inherent to the format. It is better understood as a fast local model with unusually low parameter memory and task-dependent capability.
 
-## The Docker Setup (Reproducible)
+## The Docker Setup Used for This Test
+
+> **Reproducibility boundary:** The historical setup below used mutable container tags, an unpinned Git branch, and a model download without a recorded checksum. It documents the successful path but is not bit-for-bit reproducible. A production reuse should pin the ROCm image digest, PrismML fork commit, model revision, and SHA-256 checksum.
 
 The complete setup lives in three files:
 
@@ -259,7 +265,7 @@ services:
     volumes:
       - ./models:/models:ro
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     devices:
       - /dev/kfd:/dev/kfd
       - /dev/dri:/dev/dri
@@ -272,11 +278,12 @@ services:
   anythingllm:
     image: mintplexlabs/anythingllm
     container_name: bonsai-anythingllm
-    user: "0:0"
+    # Historical workaround used user: "0:0". Prefer a volume owned by
+    # the image's documented runtime UID instead of running as root.
     volumes:
       - ./anythingllm-storage:/app/server/storage
     ports:
-      - "3001:3001"
+      - "127.0.0.1:3001:3001"
     environment:
       - STORAGE_DIR=/app/server/storage
       - LLM_PROVIDER=generic-openai
@@ -321,15 +328,15 @@ Whether this architectural difference matters for capability — beyond the curr
 
 ### On the GPU as Infrastructure
 
-108 tokens per second from a 12 GB consumer GPU running a 1 GB model, served via an OpenAI-compatible HTTP API, with RAG on top. The entire stack — GPU, driver, ROCm runtime, compiled inference engine, HTTP server, vector database, chat UI — is running on a single machine, offline, with no API costs.
+In this run, the server reported 108 tokens per second from a 12 GB consumer GPU with about 1 GB of parameter memory, served through an OpenAI-compatible HTTP API with a local RAG frontend. After images and model files were downloaded, inference could run without a cloud-model API. Loopback binding and local authentication still matter even in that configuration.
 
-Three years ago this would have required a data center. Today it's a docker-compose file and a weekend afternoon.
+The same class of experiment has become much more accessible on consumer hardware. The short Compose file hides the time spent resolving driver, kernel, model-format, and container-integration details.
 
-The infrastructure story of local AI isn't "it's as good as the cloud" — it isn't, at the top end. The story is: **the floor has risen dramatically**. A 1 GB model doing 108 tok/s with solid language reasoning and RAG is a floor, not a ceiling.
+The infrastructure story of local AI is not “it is as good as the cloud” at the top end. The local observation is narrower: a model with about 1 GB of parameter memory produced useful language and document output at high reported throughput on this system. That is enough to justify further controlled evaluation without turning one run into a universal benchmark.
 
 ### On Context Contamination as Design Information
 
-The context contamination finding — fresh thread produces better reasoning — isn't a bug to fix. It's information about how to design workflows around LLMs.
+The fresh-thread observation is not yet a general finding. It is a useful hypothesis for workflow design and evaluation.
 
 For batch analysis tasks (processing documents, answering independent questions), each task should get a fresh context window. For conversational tasks where continuity is the feature, the accumulated context is doing useful work.
 

@@ -1,5 +1,7 @@
 # 07 - ACE Framework Exploration
 
+> **Status:** Historical framework exploration. This chapter documents influence and experimentation, not endorsement or a current deployment specification.
+
 **Date:** February 2025
 **Status:** Learning Experiment
 **Source:** David Shapiro's ACE Framework

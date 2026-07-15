@@ -1,5 +1,7 @@
 # AI Agents Workshop: Building Reliable Agents in 2026
 
+> **Status:** Training outline from February 2026, revised in July 2026 to correct overly broad reliability and regulatory statements. This material is not legal advice.
+
 **Duration:** Half-day (4 hours) or Full-day (8 hours)
 **Audience:** Technical leads, developers, architects
 **Prerequisites:** Basic understanding of LLMs and APIs
@@ -14,7 +16,7 @@ By the end of this workshop, participants will be able to:
 2. Design agents with proper intent disambiguation
 3. Implement layered verification strategies
 4. Apply appropriate control protocols based on risk
-5. Navigate EU AI Act compliance requirements
+5. Identify when EU AI Act role, risk, and transparency analysis requires legal or compliance review
 
 ---
 
@@ -103,7 +105,7 @@ By the end of this workshop, participants will be able to:
 - Workflow decomposition
 
 **Module 7: Compliance Deep Dive (60 min)**
-- EU AI Act high-risk requirements
+- EU AI Act roles, use-case classification, and high-risk obligations
 - GDPR implications for AI agents
 - Documentation and audit trails
 
@@ -162,10 +164,10 @@ By the end of this workshop, participants will be able to:
 A: Use the layered approach. RAG for grounding, Chain of Verification for critical claims, Self-Consistency for reasoning, LLM Council for important decisions.
 
 **Q: How do we handle EU AI Act compliance?**
-A: First classify your system's risk level. High-risk requires 8 mandatory controls. Most business automation is Limited or Minimal risk.
+A: Start with the system's intended purpose, your operator role, affected people, sector rules, and the AI Act's prohibited, high-risk, and transparency categories. Do not infer compliance from a generic “business automation” label. Use the [European Commission's AI Act overview](https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai) as a starting point and obtain qualified review where the classification or obligations matter.
 
 **Q: What's the ROI of verification overhead?**
-A: One prevented hallucination-based error typically costs more than thousands of verification calls. Focus on high-stakes decisions.
+A: Measure expected loss, review cost, latency, and error-detection performance for the actual workflow. Spend the strongest verification budget where errors have material consequences; do not assume a universal return on additional model calls.
 
 ---
 

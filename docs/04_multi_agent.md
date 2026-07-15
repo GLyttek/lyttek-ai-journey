@@ -2,6 +2,8 @@
 
 *February 2026*
 
+> **Status:** Historical architecture snapshot. Model IDs, costs, worker roles, and “current” behavior are time-bound examples.
+
 ## The Vision
 
 "I want AI systems that collect information autonomously, and I just approve the results at the end."

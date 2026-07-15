@@ -2,6 +2,8 @@
 
 *Reflections from 4+ months of building*
 
+> **Status:** Historical reflection from February 2026. Later chapters reintroduced dashboards and persistent workers after the operational need became clearer.
+
 ## The Big Lessons
 
 ### 1. Start Stupid Simple
@@ -51,7 +53,7 @@ Our current target: **10-15 minutes per day** of CEO attention, with everything 
 We got lucky. We saw the OpenClaw vulnerability disclosure before we had any major incidents. But it could have gone differently.
 
 Security considerations that should be day-one:
-- Input sanitization (PromptShield)
+- Untrusted-input labeling and detection (the early `PromptShield` layer)
 - Cost limits (prevent runaway API bills)
 - Audit logging (know what happened)
 - Principle of least privilege (workers can only access what they need)
@@ -109,7 +111,7 @@ input_queue → worker → output_queue
 ```
 *Problem:* Still manual triggering
 
-**Phase 4: Cron + Workers (Current)**
+**Phase 4: Cron + Workers (Current at the time)**
 ```
 cron → collector → staging
 cron → synthesizer → CEO queue
@@ -161,7 +163,7 @@ But the current system handles 90% of use cases with 10% of the complexity. The 
 ## What We'd Do Differently
 
 ### Start Earlier With
-- Security considerations (GOTCHA framework)
+- Security considerations (internal GOTCHA checklist)
 - Cost tracking
 - Structured logging
 
@@ -212,6 +214,6 @@ That's the model we're betting on.
 
 ---
 
-*End of Documentation Series*
+*End of the initial documentation series; later chapters continue the journey.*
 
 *Last updated: February 2026*

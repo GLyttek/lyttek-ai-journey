@@ -1,5 +1,7 @@
 # 08 - Early LLM Patterns
 
+> **Status:** Historical pattern catalog. Implementations and model assumptions reflect the project at the time.
+
 **Date:** August 2024 - February 2025
 **Status:** Learning Journey
 **Source:** Various experiments

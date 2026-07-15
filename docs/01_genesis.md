@@ -1,5 +1,7 @@
 # 01 - Genesis: How It All Started
 
+> **Status:** Historical snapshot. Architecture and operational claims describe the project at this point in its development.
+
 *October 2025*
 
 ## The Problem
