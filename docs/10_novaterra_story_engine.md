@@ -95,7 +95,7 @@ A complete automated book generation system:
 ### What We Learned
 - Local 8B models (ministral3) produce surprisingly literary prose
 - The generation → validation → review pipeline works for creative content
-- Lore consistency checking prevents world-breaking errors early
+- Lore consistency checking flags potential world-breaking errors earlier for human review
 - Multi-model comparison reveals each model's creative strengths
 
 ## Connection to the Larger Architecture

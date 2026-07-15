@@ -54,7 +54,7 @@ We got lucky. We saw the OpenClaw vulnerability disclosure before we had any maj
 
 Security considerations that should be day-one:
 - Untrusted-input labeling and detection (the early `PromptShield` layer)
-- Cost limits (prevent runaway API bills)
+- Cost limits (reduce the risk and impact of runaway API bills)
 - Audit logging (know what happened)
 - Principle of least privilege (workers can only access what they need)
 
@@ -77,7 +77,7 @@ The READMEs pay for themselves within days.
 |----------|---------------|
 | File-based queues | Human-readable, debuggable, works with Obsidian |
 | Markdown everywhere | Universal format, future-proof |
-| Local models for bulk | Free, always available, good enough for filtering |
+| Local models for bulk | No per-call fee; locally controllable when the inference stack is available |
 | Cloud models for synthesis | Quality where it matters |
 | Cron over continuous | Simpler, predictable, no daemon management |
 

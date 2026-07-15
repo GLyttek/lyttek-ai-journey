@@ -201,7 +201,7 @@ Health monitoring runs every other autonomy tick, checking if critical workers (
 - ✓ **NEW:** Command center provides full visibility into worker status, queues, and approvals.
 - ✓ **NEW:** Vault search allows referencing existing documents in conversations.
 - ✓ **NEW:** AI opinion on approvals reduces review time significantly.
-- ✓ **NEW:** Action-first behavior eliminates unnecessary confirmation dialogs.
+- ✓ **NEW:** Action-first behavior reduces low-consequence confirmation dialogs while retaining approval gates for consequential actions.
 
 **Doesn't work yet:**
 - ~~The agent has no access to the vault's existing knowledge.~~ ✓ Basic vault search implemented.
