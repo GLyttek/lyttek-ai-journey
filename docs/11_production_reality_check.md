@@ -2,6 +2,8 @@
 
 *February 2026 — Infrastructure hardening, PDCA methodology, and the art of saying no*
 
+> **Status:** Local case-study snapshot. Metrics and worker states are observations from the documented system at that time, not current service guarantees.
+
 ---
 
 ## The Uncomfortable Truth
@@ -80,20 +82,27 @@ cmd = [sys.executable, str(script), url]
 
 **Symptom**: HybridAI returned empty responses. No errors in logs.
 
-**Root cause**: Workers spawned as subprocesses don't inherit the parent's environment variables unless explicitly passed. The `.env` file containing `OPENROUTER_API_KEY` was loaded by the main Aletheia server, but child processes started by `WorkerController` via `subprocess.Popen` had no access to these keys.
+**Root cause**: The key was available to the main application through its configuration loading path but was not present in the environment visible to the worker process. Python subprocesses normally inherit `os.environ` unless the caller supplies a replacement `env`; the original explanation incorrectly described non-inheritance as the default.
 
-**Fix**: Auto-load `.env` at module import time in `hybrid_ai.py`:
+**Historical fix**: The worker-side module loaded the same `.env` file before making API calls. That restored service, but loading secrets implicitly during module import and manually parsing dotenv syntax created hidden coupling.
+
+**Preferred durable pattern**: Load configuration once, pass only the variables required by that worker, and fail visibly when a required key is absent:
 
 ```python
-_env_path = Path("/Bibliothek/Agent-Workspace/.env")
-if _env_path.exists() and not os.environ.get("OPENROUTER_API_KEY"):
-    for line in _env_path.read_text().splitlines():
-        if "=" in line and not line.startswith("#"):
-            key, value = line.split("=", 1)
-            os.environ.setdefault(key.strip(), value.strip())
+child_env = {
+    key: os.environ[key]
+    for key in ("PATH", "HOME")
+    if key in os.environ
+}
+child_env["OPENROUTER_API_KEY"] = settings.openrouter_api_key
+
+subprocess.Popen(
+    [sys.executable, str(worker_script)],
+    env=child_env,
+)
 ```
 
-This runs once when the module is imported, before any API calls happen. The `setdefault` ensures it doesn't override keys that were properly passed through the environment.
+The public documentation no longer embeds the private workspace's absolute `.env` path. Production code should use a maintained dotenv/configuration library or a secret manager rather than a handwritten parser.
 
 ### Fix 4: The Dead Model
 
@@ -161,7 +170,7 @@ The reasoning was practical:
 | Content Validation | Basic heuristic (always) | LLM-based via OpenRouter |
 | Vector DB | Broken (500 Error) | 195k chunks, serving |
 | OpenRouter | 404 (dead model) | deepseek-chat, functional |
-| API Keys in Workers | Missing | Auto-loaded from .env |
+| API Keys in Workers | Missing | Made available to workers; later review recommends explicit scoped passing |
 | Content Queue Backlog | 90 URLs (stalled) | 79 URLs (processing) |
 | CEO Documents in Root | 46 files | 12 strategic references |
 

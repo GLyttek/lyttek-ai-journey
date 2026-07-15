@@ -3,7 +3,9 @@
 **Original Paper:** "Redefining Efficiency in AI: The Impact of 1.58-bit LLMs on the Future of Computing"
 **Written:** March 2024
 **Retrospective:** February 2026
-**Updated:** April 2026 — first confirmed production 1-bit deployment ([see addendum](#april-2026-update-the-first-production-1-bit-model))
+**Updated:** July 2026 — evidence and scope corrections added to the April local-deployment addendum
+
+> **Evidence note:** This is an author retrospective, not an independent market study. Linked papers and model documentation are external evidence; the RX 6750 XT deployment figures are local observations. Broad adoption statements are interpretations unless a source is linked.
 
 ---
 
@@ -11,7 +13,7 @@
 
 This document provides a 2026 perspective on our March 2024 analysis of BitNet b1.58 and ultra-low-bit quantization. Two years later, we can evaluate which predictions held and what surprised us.
 
-**Overall Score: 8/10** - The core thesis was validated; the specific path differed.
+**Author's retrospective score: 8/10** - a subjective assessment that the macro thesis held while the predicted technical path differed.
 
 ---
 
@@ -21,24 +23,20 @@ This document provides a 2026 perspective on our March 2024 analysis of BitNet b
 
 Our 2024 prediction: *"Efficiency gains will democratize AI access."*
 
-**Reality 2026:** This prediction was spot-on. Local LLMs went from niche hobbyist territory to mainstream:
+**Assessment in 2026:** Local inference moved well beyond hobbyist demonstrations. Small models such as Llama 3.2 and Phi-3 targeted constrained and edge environments; consumer platforms added on-device generative features; and tools such as Ollama made local model serving easier to adopt.
 
-- **Llama 3.2 3B** runs on smartphones (March 2025)
-- **Phi-3-mini** became the enterprise edge standard
-- **Apple Intelligence** brought on-device LLMs to 2 billion devices
-- **Ollama** crossed 10 million monthly active users
-
-The democratization thesis was completely validated.
+That supports the direction of the democratization thesis. It does not by itself prove universal or mainstream production adoption.
 
 ### 2. Local Models Became Standard
 
 Our 2024 prediction: *"Privacy-conscious enterprises will demand local inference."*
 
-**Reality 2026:**
-- GDPR enforcement intensified, pushing EU companies toward local solutions
-- Healthcare and finance sectors standardized on local inference
-- "Data never leaves the device" became a product differentiator
-- Claude Code, GitHub Copilot, and Cursor all added local model options
+**Assessment in 2026:**
+- privacy, data-sovereignty, latency, and offline requirements strengthened the case for local inference;
+- regulated organizations continued evaluating local or controlled deployment patterns;
+- “data stays on the device” became a product differentiator.
+
+The earlier statement that healthcare and finance had standardized on local inference was too broad. Adoption varies by organization, workload, and regulatory role.
 
 ### 3. MoE + Quantization Synergy
 
@@ -72,12 +70,12 @@ Our 2024 prediction: *"Dedicated inference hardware will emerge."*
 
 | Approach | Quality Loss | Adoption |
 |----------|-------------|----------|
-| FP16 (baseline) | 0% | Training only |
-| INT8 | <1% | Server inference |
-| **INT4 / GPTQ / AWQ** | 1-3% | **Dominant** |
-| 2-bit | 5-15% | Research only |
+| FP16 (baseline) | Baseline for this comparison | Training and inference |
+| INT8 | Task/model dependent | Widely supported inference option |
+| **INT4 / GPTQ / AWQ** | Task/model dependent | **Common local and server option** |
+| 2-bit | Often material; task/model dependent | Limited adoption |
 | 1.58-bit (BitNet) | Variable | Not mainstream |
-| **1-bit (Q1_0_g128)** | Moderate | **Early production** — Bonsai-8B (PrismML, 2026) |
+| **1-bit (Q1_0_g128)** | Task/model dependent | **Deployable implementation** — Bonsai-8B (PrismML, 2026) |
 
 **Why?** 4-bit offered the best quality/efficiency tradeoff while remaining compatible with existing GPU architectures. 1.58-bit required specialized hardware that didn't materialize at scale.
 
@@ -91,7 +89,7 @@ Our 2024 prediction: *"Dedicated inference hardware will emerge."*
 - The training-from-scratch requirement proved too costly
 - Post-training quantization (GPTQ, AWQ, GGUF) dominated instead
 
-*April 2026 correction: PrismML shipped Bonsai-8B — a commercially deployed 1-bit model running on consumer hardware at 108 tokens/sec. The "stayed academic" verdict was premature. Details in the [April 2026 addendum](#april-2026-update-the-first-production-1-bit-model).*
+*April 2026 correction: PrismML published Bonsai-8B and a compatible inference fork. A local RX 6750 XT deployment reported 108 tokens/sec in one run. This moved the topic from paper-only research to a deployable implementation; it did not establish broad production adoption. Details are in the addendum.*
 
 ### 3. Quality-at-Any-Cost Persisted Longer
 
@@ -175,9 +173,9 @@ The March 2024 whitepaper correctly identified the macro trend: efficiency would
 
 The path was different (4-bit + MoE instead of 1.58-bit from scratch), but the destination (local, efficient, accessible AI) was exactly what we predicted.
 
-**For researchers:** BitNet and ultra-low-bit quantization are no longer purely academic. PrismML's Bonsai demonstrates that 1-bit native training at production quality is achievable. The fundamental math was always sound; the ecosystem is now catching up.
+**For researchers:** BitNet and ultra-low-bit quantization are no longer paper-only concepts. PrismML's Bonsai demonstrates that a 1-bit model can be published with a runnable inference implementation. Independent quality comparisons and broader deployment evidence are still needed.
 
-**For practitioners:** 4-bit quantization (AWQ, GPTQ, GGUF) remains the safe default. But watch the 1-bit space — Bonsai-8B runs at 108 tok/s in 1 GiB on a consumer GPU. If the quality gap closes, the efficiency argument becomes overwhelming.
+**For practitioners:** Widely supported 4-bit formats remain the lower-friction default for many local deployments. Bonsai-8B is worth watching: the documented RX 6750 XT run reported 108 tok/s with about 1 GiB of parameter memory. The quality gap and workload fit still need controlled evaluation.
 
 ---
 
@@ -186,13 +184,15 @@ The path was different (4-bit + MoE instead of 1.58-bit from scratch), but the d
 
 ---
 
-## April 2026 Update: The First Production 1-bit Model
+## April 2026 Update: A Deployable 1-Bit Model
 
-*Added April 2026 following the first confirmed local deployment of a native 1-bit LLM.*
+*Added after a successful local deployment of a 1-bit LLM; revised July 2026 to remove the unsupported “first production” claim.*
 
 The February 2026 assessment that "BitNet stayed academic" requires a correction.
 
-In early 2026, **PrismML** shipped **Bonsai-8B** — a natively 1-bit trained model based on the Qwen3 architecture with 8.19 billion parameters. It uses a proprietary quantization format called **Q1_0_g128**: every 128 weights share a single FP16 scale factor, with weights stored as 1-bit values. The result is **1.125 bits per weight average** — and a model that fits in **1.07 GiB**.
+In early 2026, **PrismML** published **Bonsai-8B** — a 1-bit model based on the Qwen3 architecture with 8.19 billion parameters. It uses a custom, non-mainline format called **Q1_0_g128**: every 128 binary weights share a single FP16 scale factor. The result is **1.125 effective bits per weight** and about **1.15 GB parameter memory** according to the current model card.
+
+Primary sources: [Bonsai-8B model card](https://huggingface.co/prism-ml/Bonsai-8B-gguf) and [PrismML llama.cpp fork](https://github.com/PrismML-Eng/llama.cpp).
 
 This is not a post-training quantization of an existing model. It was trained natively at 1-bit precision, fulfilling the original BitNet research promise that post-training quantization to 1-bit would lose too much quality.
 
@@ -207,27 +207,27 @@ Results:
 - **37/37 model layers offloaded to GPU**
 - **~2.2 GiB total VRAM** (1.0 GiB model + 1.15 GiB KV cache)
 - **108 tokens/sec generation**, 147 tokens/sec prompt eval
-- RAG over uploaded documents: excellent quality
-- Language and reasoning tasks: strong
-- Arithmetic: weak (consistent with BitNet b1.58 research findings)
+- RAG over one uploaded document: useful in the author's qualitative review
+- Language tasks: promising in limited prompts
+- One lateral-thinking/math prompt failed; no general arithmetic conclusion follows
 
 ### What This Changes
 
-The February 2026 comparison table entry "1.58-bit (BitNet) | Variable | Not mainstream" was accurate at time of writing. By April 2026 it should read: **early production stage** — deployed, running on consumer hardware, genuinely useful for language-intensive tasks.
+The February 2026 comparison table entry “1.58-bit (BitNet) | Variable | Not mainstream” remained broadly accurate. By April 2026, Bonsai demonstrated a **deployable implementation** running on consumer hardware and useful for selected language-intensive tasks in this local test.
 
-The broader "ecosystem just isn't there yet" conclusion also needs revision. PrismML built the ecosystem unilaterally: custom quantization format, custom llama.cpp fork, custom kernels for AMD ROCm and presumably CUDA. It's not an open ecosystem standard — but it works, and it ships.
+The broader “ecosystem just isn't there yet” conclusion needed revision. PrismML published a custom format, model, and llama.cpp fork. This was not a mainline ecosystem standard, but it provided a working path. The public model card and fork use open-source licenses; the original “proprietary stack” description was inaccurate.
 
 ### Revised Assessment
 
 | Aspect | February 2026 | April 2026 |
 | ------ | ------------- | ---------- |
-| 1-bit models | Academic only | Bonsai-8B in production |
+| 1-bit models | Predominantly academic | Bonsai-8B deployable locally |
 | Required hardware | Theoretical ASICs | Consumer GPU (RX 6750 XT) |
-| Ecosystem | Non-existent | PrismML proprietary stack |
-| Quality vs 4-bit | Unknown gap | Strong language/RAG, weak arithmetic |
-| Inference speed | Theoretical | 108 tok/s on 12 GB GPU |
+| Ecosystem | Limited | PrismML custom open model and inference fork |
+| Quality vs 4-bit | Unknown gap | Not established by this local test |
+| Inference speed | Mostly vendor/research evidence | 108 tok/s observed once on the documented 12 GB GPU setup |
 
-The "Standards Beat Innovation" lesson from the February retrospective still stands for the mainstream — 4-bit remains dominant. But the 1-bit space moved from "promising research" to "first production deployment" faster than anticipated.
+The “Standards Beat Innovation” lesson still stands for broad adoption: 4-bit formats remain more widely supported. The 1-bit space nevertheless moved from paper-only discussion to a publicly available model and runnable implementation faster than anticipated.
 
 The paper we wrote in 2024 was more right than we gave it credit for in February 2026.
 

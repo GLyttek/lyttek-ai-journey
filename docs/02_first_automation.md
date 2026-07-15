@@ -1,5 +1,7 @@
 # 02 - First Automation: Building the Foundation
 
+> **Status:** Historical snapshot. Sections labeled “current” describe the system at the time; Chapters 9 and 11 supersede parts of this design.
+
 *November-December 2025*
 
 ## The Starting Point

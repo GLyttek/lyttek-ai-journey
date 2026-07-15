@@ -1,5 +1,7 @@
 # 10. Novaterra: From Book Project to Story Generation Engine
 
+> **Status:** Historical creative-system case study. It describes the February 2026 implementation, not the current state of the writing project.
+
 *February 2026 - The creative origin of the multi-model architecture*
 
 ---

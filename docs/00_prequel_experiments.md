@@ -1,5 +1,7 @@
 # 00 - Prequel: Early AI Experiments (August 2024)
 
+> **Status:** Historical snapshot. Later chapters document how these experiments evolved into a larger workspace.
+
 *Before the journey began - learning the fundamentals*
 
 ## Context
