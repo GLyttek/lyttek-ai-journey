@@ -87,16 +87,16 @@ Older chapters did not always make these boundaries explicit. The July 2026 edit
 |---|---|---|---|
 | [Prologue — The Ferryman Before the System](docs/prologue_pi_2023.md) | May 2023–Jan 2025 | Early conversations about trust, memory, care, and AI as a ferryman | Historical reflection |
 | [00 — From Conversation to Code](docs/00_prequel_experiments.md) | Feb–Aug 2024 | Local models, APIs, RAG, and document-generation experiments | Historical evidence review |
-| [01 — Genesis](docs/01_genesis.md) | Oct 2025 | How the workspace started with Claude Code | Historical snapshot |
+| [01 — Genesis](docs/01_genesis.md) | Oct 2025 | How conversational coding became a file-based workflow | Historical account; claims corrected against retained artifacts |
 | [02 — First Automation](docs/02_first_automation.md) | Nov–Dec 2025 | File-based workers, dashboards, queues, and early routing | Historical evidence review |
-| [03 — Security Evolution](docs/03_security_evolution.md) | Jan–Feb 2026 | Prompt injection, cost controls, and audit gaps | Historical; corrections added |
-| [04 — Multi-Agent Architecture](docs/04_multi_agent.md) | Feb 2026 | Hierarchical agents with local and cloud models | Historical snapshot |
+| [03 — Security Evolution](docs/03_security_evolution.md) | Jan–Feb 2026 | What PromptShield and the cost tracker actually controlled | Historical implementation review |
+| [04 — Multi-Agent Architecture](docs/04_multi_agent.md) | Feb 2026 | Queues, model roles, approval gates, and failure propagation | Historical architecture review |
 | [05 — Lessons Revisited](docs/05_lessons_learned.md) | Feb 2026 / Jul 2026 | What survived later operational use and what did not | Historical reflection with corrections |
-| [06 — AI Agents Training](docs/06_ai_agents_training.md) | Feb 2026 | Reliability, validation, safety, and regulation | Training snapshot; corrections added |
-| [07 — ACE Framework Exploration](docs/07_ace_framework_exploration.md) | Feb 2025 | Exploration of a layered agent architecture | Historical snapshot |
+| [06 — AI Agents Training](docs/06_ai_agents_training.md) | Feb 2026 / Jul 2026 | Reliability through evidence, bounded authority, and evaluation | Corrected training notes; original video remains historical |
+| [07 — ACE Framework Exploration](docs/07_ace_framework_exploration.md) | Feb 2025 / Jul 2026 | What the retained six-layer prototype implemented and simulated | Historical code review |
 | [08 — Early LLM Patterns Revisited](docs/08_early_llm_patterns.md) | Aug 2024–Feb 2025 | Prompt chains, RAG, tool loops, and routing under review | Historical pattern review |
 | [09 — Aletheia](docs/09_aletheia_local_agent.md) | Feb 2026 / Jul 2026 | Standalone prototype, audit findings, and transition into Hermes | Historical architecture review |
-| [10 — Novaterra Story Engine](docs/10_novaterra_story_engine.md) | Feb 2026 | Multi-model story generation experiment | Historical snapshot |
+| [10 — Novaterra Story Engine](docs/10_novaterra_story_engine.md) | Aug 2024 / Feb 2026 / Jul 2026 | A 12-chapter drafting engine, model comparison, and rule-based checks | Historical artifact review |
 | [11 — Production Reality Check](docs/11_production_reality_check.md) | Feb 2026 | Infrastructure hardening and PDCA verification | Verified case-study snapshot |
 | [12 — Bonsai 1-bit Local Deployment](docs/12_bonsai_1bit_local_deployment.md) | Apr 2026 | AMD ROCm deployment and local benchmark | Single-machine case study |
 | [13 — When Agentic Research Needed Less Agency](docs/13_bounded_research_scripts.md) | Jul 2026 | Replacing brittle model-driven research crons with bounded scripts | Verified local case-study snapshot |
@@ -140,8 +140,8 @@ Do not deploy excerpts unchanged in a sensitive environment.
 
 ## Training, research, and related work
 
-- [AI Agents Workshop](workshops/AI_Agents_Workshop_Outline.md) — historical workshop outline; claims need review before reuse
-- [Training video](https://youtu.be/64qeuW15J8g) — presentation snapshot
+- [AI Agents Workshop](workshops/AI_Agents_Workshop_Outline.md) — revised public outline with exercises, evidence boundaries, and facilitator guardrails
+- [Training video](https://youtu.be/64qeuW15J8g) — unedited February 2026 presentation snapshot; later corrections live in Chapter 06 and the workshop outline
 - [Redefining Efficiency in AI](whitepapers/Redefining%20Efficiency%20in%20AI%20The%20Impact%20of%201.58-bit%20LLMs%20on%20the%20Future%20of%20Computing.pdf) — 2024 paper with a [2026 retrospective](whitepapers/1_58_bit_llm_retrospective_2026.md)
 - [`GLyttek/myscripts`](https://github.com/GLyttek/myscripts) — public Python experiments and utilities
 

@@ -1,192 +1,164 @@
-# 06 - AI Agents Training: Accelerating Agent Use in 2026
+# 06 - AI Agents Training: Reliability Means Showing the Boundary
 
-*Building Reliable, Trustworthy, and Effective AI Agents*
+> **Status:** Training notes from February 2026, revised in July 2026 after reviewing the claims against later operating experience. The linked video remains a historical recording and cannot carry these corrections retroactively. This material is not legal advice.
 
-> **Status:** Training snapshot from February 2026, revised in July 2026 to correct overly strong reliability and regulatory claims. It is not legal advice.
+> **Video:** [Original training recording on YouTube](https://youtu.be/64qeuW15J8g)
 
-> **Video:** [Watch the full training on YouTube](https://youtu.be/64qeuW15J8g)
+## What I was trying to teach
 
-## Overview
+The training began with two recurring failures.
 
-This training addresses two recurring challenges when organizations deploy AI agents:
+The first was unsupported output: a model produced an answer that sounded complete but could not be defended. The second was the intent gap: a person gave a short instruction and the system filled in missing scope on its own.
 
-1. **The Reliability Challenge** - How to reduce, detect, and contain unsupported output
-2. **The Intent Gap** - How to bridge human intent and AI interpretation
+I initially presented five “pillars of reliability.” That language implied a settled framework. What I had was a toolbox. Each technique can reduce one class of failure while leaving others untouched.
 
-## The Five Pillars of Agent Reliability
+## Five tools, each with a failure mode
 
-### 1. RAG (Retrieval-Augmented Generation)
+### Retrieval
 
-Ground AI responses in verified facts by providing an external "cheatsheet."
+Retrieval-augmented generation can place selected documents beside a question:
 
-```
-User Query → Retrieve Relevant Docs → Generate from Context → Cite Sources
-```
-
-**Key Insight:** RAG can ground the *input* in selected sources. It does not guarantee that retrieval is complete or that the generated answer is faithful to the retrieved text.
-
-### 2. Chain of Verification
-
-Trust, but verify - validate AI output after generation.
-
-```
-1. AI generates initial response
-2. System extracts factual claims
-3. Claims are fact-checked independently
-4. Answer regenerated with verified facts
+```text
+question → retrieve documents → generate answer → retain citations
 ```
 
-**Key Insight:** Chain of Verification validates the *output*, catching errors even in sourced content.
+This can improve grounding. It does not prove that the right document was indexed, retrieved, current, or interpreted faithfully. A citation is useful only when it supports the nearby claim.
 
-### 3. Self-Consistency
+### Claim checking
 
-If independent samples converge, that can increase confidence for some reasoning tasks. Repetition is not proof: models can reproduce the same shared error.
+A verification pass can extract factual claims, seek independent evidence, and revise unsupported sentences:
 
-- Run the same prompt 3-5 times
-- Collect all responses
-- Identify consensus
-
-**Trade-off:** Higher latency and cost. The benefit must be measured for the task instead of assumed.
-
-### 4. LLM Council (Model Diversity)
-
-Multiple models can review the same output, but model count alone does not create independence. Select models and prompts through task-specific evaluation rather than fixed personality stereotypes.
-
-| Review role | Purpose | Evidence needed |
-|-------------|---------|-----------------|
-| Generator | Produce the candidate answer | Task success criteria |
-| Critic | Identify unsupported or unsafe claims | Specific citations or test failures |
-| Adjudicator | Resolve disagreements | Defined rubric and escalation rule |
-
-### 5. Layered Integration
-
-Combine all techniques for defense in depth:
-
+```text
+candidate answer
+    → list checkable claims
+    → inspect independent sources or tests
+    → revise with evidence and uncertainty
 ```
-RAG (Foundation) → Chain of Verification → Self-Consistency → LLM Council (Audit)
+
+The old text said that Chain of Verification “validates the output.” That was too strong. A second model can repeat the first model's mistake, invent a source, or fail to identify the important claim. The method creates another opportunity to detect error; it is not a certificate.
+
+### Repeated sampling
+
+Generating several answers can reveal instability. If answers diverge, the task or prompt may be underspecified. If they converge, confidence may increase for a narrowly evaluated task.
+
+Agreement is not truth. Related models can reproduce the same learned error, and repeated calls increase cost and latency.
+
+### Multiple reviewers
+
+Different models or prompts can play generator, critic, and adjudicator roles. This is useful when disagreement is captured and resolved against a rubric.
+
+Model count alone does not create independence. A council can turn one unsupported answer into three polished versions of the same assumption.
+
+### Deterministic tests and bounded effects
+
+The most important addition from later practice was not another model. It was ordinary software control:
+
+- schema validation;
+- unit and integration tests;
+- source and destination allowlists;
+- filesystem and tool permission limits;
+- dry runs and diffs;
+- explicit approval before irreversible or external effects.
+
+Language models are most useful where interpretation is required. Deterministic code should enforce the boundary where it can.
+
+## Intent must survive translation into action
+
+“Delete old files” is not an executable requirement. The agent still needs to know which directory, what “old” means, whether symlinks count, what must be retained, and whether a backup is required.
+
+For consequential work, I now prefer a small intent artifact:
+
+```yaml
+action: archive
+scope: /approved/input/path
+selection: modified_before_2025-01-01
+excluded:
+  - legal-hold
+  - active-projects
+preview_required: true
+approval_required: true
 ```
+
+The artifact does not eliminate ambiguity, but it makes assumptions reviewable before a tool acts.
+
+## Validation is a design, not a final model call
+
+The original maturity model suggested a progression from humans validating everything toward AI validating almost everything. That can become a story of automation for its own sake.
+
+A better progression is based on consequence and evidence:
+
+| Stage | What changes |
+|---|---|
+| Observe | Record inputs, outputs, tool calls, and failures without granting new authority |
+| Assist | Let models flag issues; humans inspect the evidence and effect |
+| Bound | Automate reversible actions inside tested permissions and budgets |
+| Evaluate | Measure task errors, missed detections, false alarms, and recovery behavior |
+| Expand selectively | Increase authority only for cases whose failure cost and controls are understood |
+
+Some workflows should remain human decisions even if the model becomes more accurate. The goal is not maximum autonomy. It is appropriate autonomy.
+
+## A practical risk boundary
+
+| Consequence | Default control | Examples |
+|---|---|---|
+| High | Strong authentication, explicit approval, exact effect preview | Delete data, publish, transfer funds, change access |
+| Medium | Isolated execution, tests, diff, human review | Code changes, configuration, drafted external messages |
+| Low and reversible | Bounded automation, logging, sampled review | Read-only collection from approved public sources |
+
+Risk depends on data sensitivity, permissions, reversibility, and destination. “Summarize” is not automatically low risk if the input is private or the output is sent externally.
+
+## Threats worth teaching without theatre
+
+The old material used labels such as “AI kill chain” and listed six dramatic attack vectors. The practical risks are easier to understand in ordinary language:
+
+- untrusted content can be mistaken for an instruction;
+- a useful tool can have more permission than the task requires;
+- generated parameters can point to the wrong file, account, or destination;
+- hidden state and silent fallback can obscure what actually ran;
+- one agent can pass malicious or unsupported material to another;
+- logs can leak the sensitive content they were meant to protect;
+- configuration changes can quietly widen authority.
+
+The response is not a magic prompt. It is isolation, least privilege, typed interfaces, validation, approval, logging, and recovery testing.
+
+## EU rules: applicability comes before slogans
+
+Four legal frameworks may matter, depending on the organization, role, sector, data, and intended use:
+
+| Framework | Operational question | Status as of July 2026 |
+|---|---|---|
+| EU AI Act | What is the system's intended purpose, operator role, and risk category? | Entered into force in 2024; application is phased. Most remaining provisions are scheduled for 2 August 2026, with exceptions. |
+| GDPR | Does the workflow process personal data, and on what lawful basis? | Applicable. |
+| NIS2 | Is the organization within national implementing law, and what security duties apply? | EU transposition deadline was 17 October 2024; national implementation must be checked. |
+| DORA | Is the organization or ICT relationship within the financial-sector regime? | Applies from 17 January 2025. |
+
+Primary references:
+
+- [European Commission — AI Act overview and application timeline](https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai)
+- [EUR-Lex — NIS2 Directive (EU) 2022/2555](https://eur-lex.europa.eu/eli/dir/2022/2555/oj/eng)
+- [EUR-Lex — DORA Regulation (EU) 2022/2554](https://eur-lex.europa.eu/eli/reg/2022/2554/oj/eng)
+
+A generic label such as “internal agent” or “business automation” does not establish compliance. Where classification or obligations matter, obtain qualified legal or compliance review.
+
+## A 30-day experiment, not a rollout promise
+
+A useful first month can stay deliberately small:
+
+1. choose one reversible workflow and write its failure conditions;
+2. build a representative evaluation set before changing authority;
+3. add provenance, logs, budgets, and an approval boundary;
+4. run a pilot, inspect failures, and decide whether the workflow deserves expansion.
+
+The evidence from the pilot should decide the next step. A calendar should not.
+
+## What I would teach now
+
+- Retrieval can ground an answer; it cannot guarantee one.
+- Verification requires independent evidence or executable tests where possible.
+- Human review needs sources, uncertainty, and an exact effect—not just polished prose.
+- Friction is useful when it protects a meaningful boundary.
+- Trust should be attached to a tested workflow, not to a model name.
 
 ---
 
-## The Two Critical Gaps
-
-### Intent Gap
-
-**Problem:** "Delete old files" → Agent deletes *all* files matching "old_*"
-
-**Solution:**
-- Disambiguation loops ("Which folder?")
-- Clarification chains ("Create backup first?")
-- Living requirements artifacts
-
-### Validation Gap
-
-**Problem:** Humans can't validate all AI output at scale
-
-**Solution:**
-- AI-to-AI validation chains
-- Validation maturity levels (see below)
-
-### Validation Maturity Model
-
-| Level | Description | Timeline |
-|-------|-------------|----------|
-| 1 | Human validates all | Current |
-| 2 | Hybrid (AI flags issues) | Now |
-| 3 | AI-assisted validation with measured human escalation | Target state |
-| 4 | Bounded automated validation for low-consequence cases | Conditional on evidence |
-| 5 | Continuously evaluated and corrected workflows | Long-term direction, not a forecast |
-
----
-
-## Safety Architecture
-
-### Control Protocols
-
-| Risk Level | Oversight | Examples |
-|------------|-----------|----------|
-| High | Explicit approval and strong authentication | Delete, publish, transfer funds, change access |
-| Medium | Review, test, and edit before effect | Draft emails, code changes, configuration |
-| Low | Bounded automation with logging | Read-only search over approved sources |
-
-Risk depends on data sensitivity, permissions, reversibility, and downstream effect. “Summarize” is not automatically low risk when the input or destination is sensitive.
-
-### Agent Security Threats
-
-1. **OODA Loop Vulnerability** - Each stage is attackable
-2. **AI Kill Chain** - Prompt injection → tool invocation
-3. **Multi-Stage Attacks** - Suspicious steps hidden in workflows
-4. **Configuration Manipulation** - "YOLO mode" activation
-5. **Agent-to-Agent Transmission** - Self-replicating via code analysis
-6. **Invisible Steganography** - Unicode hidden commands
-
-**Defense:** Zero Trust for Agents
-
----
-
-## EU Regulatory Compliance
-
-Four frameworks to consider. Applicability depends on role, sector, system purpose, and jurisdiction:
-
-| Framework | Focus | Timeline |
-|-----------|-------|----------|
-| EU AI Act | Risk-based regulation | Phased application; most provisions apply from 2 Aug 2026 |
-| GDPR | Data protection | Active |
-| NIS2 | Cybersecurity | EU transposition deadline was 17 Oct 2024; national implementation varies |
-| DORA | Financial resilience | Applied from 17 Jan 2025 |
-
-### EU AI Act Risk Levels
-
-- **Prohibited:** Social scoring, manipulative AI
-- **High-Risk:** Includes specified uses in employment, credit, and education; obligations depend on the system and operator role
-- **Limited-Risk:** Chatbots (user notification)
-- **Minimal-Risk:** Systems outside the prohibited, high-risk, or transparency categories; other applicable law still applies
-
-Primary reference: [European Commission — AI Act](https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai). This section is an operational overview, not legal advice.
-
----
-
-## The 30-Day Sprint
-
-| Week | Focus |
-|------|-------|
-| 1 | Audit workflows for ambiguity |
-| 2 | Build RAG knowledge base |
-| 3 | Implement verification loops |
-| 4 | Launch pilot agent |
-
-> *"Start small, verify everything, scale trust."*
-
----
-
-## The AI Orchestration Skill Tree
-
-```
-Level 1: Conditioning & Steering
-         → Specify intent, engineer context
-
-Level 2: Authority & Verification
-         → Human control, verification mechanisms
-
-Level 3: Workflows & Orchestration
-         → Decompose problems, build observability
-
-Level 4: Compounding & Leverage
-         → Evaluation harnesses, feedback loops
-```
-
----
-
-## Key Takeaways
-
-1. **Unsupported output cannot be eliminated by one technique** - validation and consequence limits matter
-2. **Intent must be explicit** - use living requirements
-3. **Friction is a feature** - match oversight to risk
-4. **AI can assist validation** - humans remain accountable for the validation design and escalation boundary
-5. **Agent adoption increases the need for explicit authority and evidence**
-
----
-
-*Based on internal training materials, February 2026*
-
-*Watch the full video: [https://youtu.be/64qeuW15J8g](https://youtu.be/64qeuW15J8g)*
+*Based on internal training material from February 2026; corrected in July 2026.*

@@ -1,182 +1,164 @@
-# AI Agents Workshop: Building Reliable Agents in 2026
+# AI Agents Workshop: Designing Bounded, Verifiable Workflows
 
-> **Status:** Training outline from February 2026, revised in July 2026 to correct overly broad reliability and regulatory statements. This material is not legal advice.
+> **Status:** Public outline derived from a February 2026 training, revised in July 2026. The original [video recording](https://youtu.be/64qeuW15J8g) remains a historical artifact and may contain claims corrected here. This outline is not legal advice or a complete workshop package.
 
-**Duration:** Half-day (4 hours) or Full-day (8 hours)
-**Audience:** Technical leads, developers, architects
-**Prerequisites:** Basic understanding of LLMs and APIs
+**Format:** Half-day, 4 hours
 
----
+**Audience:** Technical leads, developers, architects, and security practitioners
 
-## Workshop Objectives
+**Prerequisites:** Basic familiarity with LLM APIs and software workflows
 
-By the end of this workshop, participants will be able to:
+## Purpose
 
-1. Identify and mitigate AI hallucination risks
-2. Design agents with proper intent disambiguation
-3. Implement layered verification strategies
-4. Apply appropriate control protocols based on risk
-5. Identify when EU AI Act role, risk, and transparency analysis requires legal or compliance review
+This workshop does not teach participants how to make an agent “trustworthy” through prompting. It teaches them how to expose uncertainty, constrain authority, and collect evidence around one workflow.
 
----
+By the end, participants should be able to:
 
-## Agenda (Half-Day Version)
+1. turn a vague agent idea into a bounded action and failure model;
+2. distinguish retrieval, model review, and executable verification;
+3. identify where untrusted data can become control input;
+4. choose approval, isolation, logging, and recovery controls by consequence;
+5. draft a small evaluation plan before increasing autonomy;
+6. recognize when legal or compliance classification requires qualified review.
 
-### Module 1: The Reliability Challenge (60 min)
+## Half-day agenda
 
-**Theory (20 min)**
-- Why AI hallucinations happen
-- The business impact of unreliable agents
-- Reframing hallucination as a validation problem
+The four-hour format consists of a 15-minute opening, four 45-minute modules, 20 minutes of breaks, and a 25-minute close.
 
-**Demo (20 min)**
-- Live demonstration of hallucination scenarios
-- RAG implementation walkthrough
-- Chain of Verification in action
+### Module 1 — From fluent answer to checkable claim
 
-**Exercise (20 min)**
-- Participants identify hallucination risks in their use cases
-- Design a verification strategy for one scenario
+**Question:** What can the workflow actually prove?
 
----
+Participants compare four mechanisms:
 
-### Module 2: The Intent Gap (60 min)
+- retrieval supplies selected context;
+- citation links a sentence to a source;
+- a second model critiques a candidate answer;
+- deterministic tests check properties that can be encoded.
 
-**Theory (20 min)**
-- Intent Gap vs. Validation Gap
-- Why "delete old files" goes wrong
-- Living requirements artifacts
+**Demonstration:** A sourced answer containing a claim not supported by its citation.
 
-**Demo (20 min)**
-- Disambiguation loop implementation
-- Clarification chain patterns
-- Intent artifact creation
+**Exercise:** Extract the checkable claims, assign an evidence type to each, and mark what remains interpretation.
 
-**Exercise (20 min)**
-- Participants write intent artifacts for their use cases
-- Peer review and critique
+**Output:** A claim–evidence table, not a generic “verification strategy.”
 
----
+### Module 2 — Translating intent without inventing scope
 
-### Module 3: Safety Architecture (60 min)
+**Question:** What decisions are hidden inside a short instruction?
 
-**Theory (20 min)**
-- Control protocols by risk level
-- Zero Trust for Agents
-- The six attack vectors
+The working example is “delete old files.” Participants identify directory, age rule, exclusions, backup, symlinks, preview, rollback, and authorization.
 
-**Demo (20 min)**
-- Risk classification matrix
-- Approval workflow implementation
-- Security monitoring patterns
+**Demonstration:** Convert a sentence into a typed intent artifact and dry-run output.
 
-**Exercise (20 min)**
-- Participants classify their planned agents by risk
-- Design appropriate control protocols
+**Exercise:** Write an artifact for one participant workflow and have another participant attack its ambiguity.
 
----
+**Output:** A revised intent artifact with explicit unresolved questions.
 
-### Module 4: Implementation Roadmap (60 min)
+### Module 3 — Treating content as data and tools as authority
 
-**Theory (20 min)**
-- The 30-day sprint framework
-- Validation maturity levels
-- EU AI Act essentials
+**Question:** Where can an attacker or accident change behavior?
 
-**Workshop (40 min)**
-- Participants create their own 30-day plan
-- Present and receive feedback
-- Q&A and next steps
+The module covers:
 
----
+- indirect prompt injection in pages, documents, and transcripts;
+- excessive filesystem, network, account, or publishing permission;
+- unsafe destinations and generated tool arguments;
+- agent-to-agent propagation of unsupported material;
+- sensitive data copied into prompts or logs;
+- silent fallback and configuration drift.
 
-## Agenda (Full-Day Extension)
+**Demonstration:** An untrusted document requests a tool action. Prompt delimiters flag the boundary but do not enforce it; a typed tool policy rejects the effect.
 
-### Additional Modules
+**Exercise:** Map data flow, trust transitions, permissions, and approval points for one agent.
 
-**Module 5: Hands-On RAG Implementation (90 min)**
-- Set up vector database
-- Implement embedding pipeline
-- Build retrieval-augmented agent
+**Output:** A small threat model tied to concrete controls.
 
-**Module 6: Multi-Agent Orchestration (90 min)**
-- LLM Council patterns
-- Agent-to-agent communication
-- Workflow decomposition
+### Module 4 — Earning limited autonomy
 
-**Module 7: Compliance Deep Dive (60 min)**
-- EU AI Act roles, use-case classification, and high-risk obligations
-- GDPR implications for AI agents
-- Documentation and audit trails
+**Question:** What evidence would justify giving the workflow more authority?
 
----
+Participants define:
 
-## Materials Provided
+- a representative evaluation set;
+- success and failure criteria;
+- false-positive and missed-detection measures;
+- budgets and rate limits;
+- human escalation rules;
+- rollback and incident evidence;
+- conditions under which the pilot stops.
 
-- [ ] Slide deck (34 slides)
-- [ ] Video recording: https://youtu.be/64qeuW15J8g
-- [ ] Code samples repository
-- [ ] Intent artifact templates
-- [ ] Risk classification matrix
-- [ ] 30-day sprint template
-- [ ] EU AI Act checklist
+**Exercise:** Draft a 30-day experiment for one reversible workflow.
 
----
+**Output:** A pilot plan whose next phase depends on measured results rather than a predetermined rollout.
 
-## Technical Requirements
+## Risk-based control table
 
-**For Demos:**
-- Python 3.10+
-- Ollama (local LLM)
-- FAISS or similar vector DB
-- Access to cloud LLM APIs (optional)
+| Consequence | Default workshop recommendation | Example |
+|---|---|---|
+| High or irreversible | Strong authentication, exact effect preview, explicit approval, recovery plan | Delete, publish, transfer funds, alter access |
+| Medium | Isolated environment, tests, diff, human review before effect | Code and configuration changes, external drafts |
+| Low and reversible | Bounded automation, logging, sampled review | Read-only collection from approved public sources |
 
-**For Exercises:**
-- Laptop with code editor
-- Internet access
-- Whiteboard/Miro for collaboration
+The label belongs to the complete workflow. A summarizer handling private health data is not low risk merely because it only produces text.
 
----
+## Full-day extension
 
-## Facilitator Notes
+A full-day version can add three practical labs:
 
-### Key Messages to Reinforce
+### Retrieval and provenance lab
 
-1. **"The bottleneck is validation, not hallucination prevention"**
-   - Don't try to eliminate hallucinations
-   - Build robust validation mechanisms
+Build a small corpus, inspect chunking and retrieval failures, require claim-level citations, and test stale or conflicting sources. A vector database is optional; the learning target is provenance, not a particular product.
 
-2. **"Friction is a feature, not a bug"**
-   - High-risk actions need explicit approval
-   - Low-risk can be autonomous
+### Tool-bound agent lab
 
-3. **"AI validates AI; humans validate validators"**
-   - Solve the human validation bottleneck
-   - Build trust incrementally
+Give an agent one typed, reversible tool in an isolated environment. Add parameter validation, dry-run behavior, structured logs, and an approval gate. Test both ordinary mistakes and adversarial input.
 
-4. **"Start small, verify everything, scale trust"**
-   - Don't boil the ocean
-   - Pilot → Prove → Scale
+### Evaluation and legal-triage lab
 
-### Common Questions
+Create an evaluation set and review the intended purpose, affected people, data, operator role, and sector. This is triage, not a legal determination.
 
-**Q: How do we know when to use which verification method?**
-A: Use the layered approach. RAG for grounding, Chain of Verification for critical claims, Self-Consistency for reasoning, LLM Council for important decisions.
+Primary legal references:
 
-**Q: How do we handle EU AI Act compliance?**
-A: Start with the system's intended purpose, your operator role, affected people, sector rules, and the AI Act's prohibited, high-risk, and transparency categories. Do not infer compliance from a generic “business automation” label. Use the [European Commission's AI Act overview](https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai) as a starting point and obtain qualified review where the classification or obligations matter.
+- [European Commission — AI Act overview and application timeline](https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai)
+- [EUR-Lex — NIS2 Directive (EU) 2022/2555](https://eur-lex.europa.eu/eli/dir/2022/2555/oj/eng)
+- [EUR-Lex — DORA Regulation (EU) 2022/2554](https://eur-lex.europa.eu/eli/reg/2022/2554/oj/eng)
 
-**Q: What's the ROI of verification overhead?**
-A: Measure expected loss, review cost, latency, and error-detection performance for the actual workflow. Spend the strongest verification budget where errors have material consequences; do not assume a universal return on additional model calls.
+## Facilitator guardrails
+
+The February material used memorable slogans. These are the corrected versions.
+
+| Earlier shorthand | Better teaching point |
+|---|---|
+| “The bottleneck is validation, not hallucination prevention.” | Reliability depends on task design, evidence, permissions, validation, and consequence limits. |
+| “AI validates AI; humans validate validators.” | Models can assist review; independent sources, executable tests, and accountable people establish the boundary. |
+| “Low-risk can be autonomous.” | Reversible, bounded actions may be automated after evaluation; the whole data and destination path determines risk. |
+| “Start small, verify everything, scale trust.” | State what is checked, measure failures, and expand only the authority supported by evidence. |
+
+Facilitators should not demonstrate a dangerous action against a real account or production system. Use disposable data, isolated credentials, and dry runs. Participants should leave with evidence artifacts, not with a one-click “autonomous agent.”
+
+## Materials and availability
+
+| Item | Public status |
+|---|---|
+| Historical training video | [Available on YouTube](https://youtu.be/64qeuW15J8g) |
+| Corrected training notes | [Chapter 06](../docs/06_ai_agents_training.md) |
+| Historical code examples | [Public `myscripts` repository](https://github.com/GLyttek/myscripts); examples require review before reuse |
+| Slide deck | Not included in this repository |
+| Intent and risk templates | Described in this outline; no packaged template set is currently published |
+| Legal checklist | Not provided; use official sources and qualified review |
+
+## Technical setup
+
+For demonstrations:
+
+- Python 3.10 or newer;
+- an isolated working directory or disposable container;
+- a local or cloud model endpoint with test credentials;
+- approved sample documents containing no private or client data;
+- a code editor and a way to inspect structured logs.
+
+The workshop should still work if a model endpoint fails. The core lessons are the boundary, evidence, and recovery behavior—not a live model performance show.
 
 ---
 
-## Follow-Up Resources
-
-- [Lyttek AI Journey](https://github.com/GLyttek/lyttek-ai-journey)
-- [Training Video](https://youtu.be/64qeuW15J8g)
-- [Code Samples](https://github.com/GLyttek/myscripts)
-
----
-
-*Workshop developed by Lyttek GmbH, February 2026*
+*Developed by Lyttek GmbH in February 2026; substantially revised in July 2026.*

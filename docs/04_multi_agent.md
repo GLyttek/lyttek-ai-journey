@@ -1,196 +1,117 @@
-# 04 - Multi-Agent Architecture: Hierarchical AI Systems
+# 04 - Multi-Agent Architecture: What the Hierarchy Actually Bought Me
+
+> **Status:** Historical architecture snapshot from February 2026. Revised in July 2026 to distinguish implemented components, operating assumptions, and diagrams of intended behavior.
 
 *February 2026*
 
-> **Status:** Historical architecture snapshot. Model IDs, costs, worker roles, and “current” behavior are time-bound examples.
+## The goal was less noise, not more agents
 
-## The Vision
+My original sentence was: “I want AI systems that collect information autonomously, and I just approve the results at the end.”
 
-"I want AI systems that collect information autonomously, and I just approve the results at the end."
+That sounded efficient. It also hid most of the hard questions. Who chose the sources? What happened when a collector misunderstood an article? Which data could leave the machine? What evidence reached the final reviewer? What did “approve” authorize?
 
-This simple statement drove our architecture evolution. The key insight: **different tasks need different AI capabilities** (and costs).
+The useful part of the idea was smaller: separate cheap collection from expensive synthesis, and keep a human decision before consequential use.
 
-## The Cost Problem
-
-Cloud AI models are powerful but expensive. Running everything through GPT-4 or Claude would cost hundreds per day. But local models, while cheap, lack the reasoning ability for complex synthesis.
-
-**Solution: Hierarchical specialization.**
-
-```
-┌─────────────────────────────────────────────────────┐
-│  CEO (Human)                                        │
-│  Role: Final approval, strategic decisions          │
-│  Cost: Your time                                    │
-├─────────────────────────────────────────────────────┤
-│  Team Leads (Cloud Models via OpenRouter)           │
-│  Role: Synthesis, quality control, report writing   │
-│  Cost: ~$0.01-0.05 per report                       │
-├─────────────────────────────────────────────────────┤
-│  Collectors (Local Docker Models)                   │
-│  Role: Data gathering, filtering, 24/7 monitoring   │
-│  Cost: FREE (runs on your hardware)                 │
-└─────────────────────────────────────────────────────┘
+```text
+sources
+   │
+   ▼
+bounded collectors
+   │  retained items + source metadata
+   ▼
+synthesis step
+   │  draft briefing
+   ▼
+human review
 ```
 
-## Influenced By David Shapiro
+I described these layers as collectors, team leads, and a CEO. Those were role metaphors expressed in folders and Python classes, not a digital company.
 
-We studied several frameworks:
+## What was implemented
 
-### ACE Framework
-- 100% local, no cloud
-- Good for privacy, but limited reasoning
-- Inspired our local collector approach
+The workspace contained topic-specific collectors, a model router, staging directories, briefing templates, and approval queues. Local models could rank or summarize items. Cloud models could be selected for synthesis. Files made the hand-offs visible.
 
-### HAAS (Hierarchical Autonomous Agent Swarm)
-- Three-tier hierarchy
-- "Supreme Oversight Board" at top
-- Directly influenced our CEO → Team Lead → Collector structure
-
-### GATO (Heuristic Imperatives)
-- Ethical guidelines for AI
-- "Reduce suffering, increase prosperity, increase understanding"
-- Reminded us that AI should serve human values
-
-## Our Implementation
-
-### Layer 1: Collectors (Local, Free)
-
-Topic-specific agents running on Docker:
+A collector followed this general pattern:
 
 ```python
-class AISecurityCollector:
-    def __init__(self):
-        self.model = "ai/gemma3:latest"  # Local Docker model
-        self.api = "http://localhost:12434/v1"  # OpenAI-compatible
+items = fetch_approved_sources()
 
-    def collect(self):
-        # Fetch RSS feeds (HackerNews, Schneier, etc.)
-        items = self.fetch_all_sources()
-
-        # Use LOCAL model to assess relevance
-        for item in items:
-            score = self.assess_relevance(item)
-            if score >= 0.5:
-                self.stage_for_synthesis(item)
+for item in items:
+    score = assess_relevance(item)
+    if score >= threshold:
+        stage_with_source_metadata(item)
 ```
 
-**Cost per run: $0.00** (local model, your electricity)
+A later step could turn staged findings into a draft briefing. The human-facing folder was named `00_CEO/Pending_Approval/`. Its value was not the executive branding. It was the state transition: a generated document remained pending until a person moved, edited, or rejected it.
 
-### Layer 2: Team Leads (Cloud, Quality)
+The code and artifacts support the existence of these components. They do not support the stronger impression that every topic ran continuously through one uniformly tested production pipeline.
 
-Synthesis agents using OpenRouter:
+## Why local and cloud models were separated
 
-```python
-class TeamLeadProcessor:
-    def __init__(self):
-        self.model = "mistralai/mistral-small-creative"
-        self.router = LLMRouter()
+In February 2026, local models were useful for repetitive screening where false positives were tolerable and the source material should remain on the machine. Cloud models were sometimes better at compressing several findings into readable prose.
 
-    def synthesize(self, collector_output):
-        # Create executive briefing from raw findings
-        prompt = f"""
-        Synthesize these {len(items)} findings into an
-        executive briefing for the CEO...
-        """
+The first version of this chapter attached precise prices to reports and claimed that local work was free. Those numbers were snapshots of particular model routes and prompt sizes, not stable benchmarks. Local inference has no per-token API bill, but it still consumes power, memory, time, and hardware capacity.
 
-        result = self.router.call_openrouter(
-            model_id=self.model,
-            prompt=prompt,
-            caller="team_lead"
-        )
+The durable decision rule was not “local for simple, cloud for smart.” It became:
 
-        return self.format_for_ceo(result)
+- keep sensitive or private material local unless there is an explicit reason not to;
+- use the smallest model that passes a task-specific test;
+- retain source references through every transformation;
+- treat model output as a draft rather than a decision;
+- measure cost and latency instead of copying yesterday's estimate.
+
+Current boundaries are documented in [`CURRENT_STATE.md`](../CURRENT_STATE.md).
+
+## Where the hierarchy came from
+
+I was exploring David Shapiro's [ACE Framework](https://github.com/daveshap/ACE_Framework) and [OpenAI Agent Swarm](https://github.com/daveshap/OpenAI_Agent_Swarm). Their layered diagrams made it easier to think about direction flowing down and telemetry flowing up.
+
+I borrowed that separation, then compressed it:
+
+```text
+human intent and approval
+          │
+          ▼
+planning or synthesis
+          │
+          ▼
+bounded collection or execution
 ```
 
-**Cost per report: ~$0.02** (cloud model, pay per token)
+This was influence, not implementation equivalence. My collectors did not become autonomous cognitive entities because I placed them below a “team lead.” The hierarchy was a way to divide responsibility and model cost.
 
-### Layer 3: CEO Approval (Human)
+Chapter 07 examines the ACE prototype itself, including how much of it was simulated.
 
-Reports land in `00_CEO/Pending_Approval/`:
+## Where the diagram lied by omission
 
-```markdown
-# AI Security Briefing
+The clean three-layer drawing concealed failure propagation.
 
-**Generated:** 2026-02-01 21:03
-**Source:** Automated Collection
+A collector could rank a weak source highly. A synthesis model could remove uncertainty while making the prose smoother. A human reviewer could approve a briefing because it looked organized. Several agents did not create independent verification; they could compound the same error.
 
-## Executive Summary
-The most critical AI security development this week is...
+The old chapter also claimed a roughly ten-percent false-positive rate and a fixed daily operating cost. I found no retained evaluation set or complete cost record that justified those figures, so they are no longer presented as measurements.
 
-## Recommended Actions
-| Priority | Action | Timeline |
-|----------|--------|----------|
-| Critical | Audit OpenClaw deployments | 1 week |
-| High | Reassess defensive AI | 2 weeks |
+The safer architecture requires more than roles:
 
----
-**CEO Action Required:**
-- [ ] Approve for Knowledge Lab
-- [ ] Mark for follow-up
-- [ ] Reject
-```
+- source allowlists or explicit source review;
+- immutable provenance between collection and synthesis;
+- evaluation sets for relevance scoring;
+- limits on files, tools, destinations, and spending;
+- visible failures rather than silent fallback;
+- human approval that identifies the exact effect being approved.
 
-**Cost: Your attention** (reading and deciding)
+## Human approval is a boundary only when it has context
 
-## The Flow in Practice
+A checkbox is not meaningful oversight if the reviewer cannot see the sources, uncertainty, diff, and intended destination. The early approval folder improved visibility, but it did not automatically answer those questions.
 
-```
-08:00  Collector runs (cron)
-       → Fetches RSS feeds
-       → Local model scores relevance
-       → Stages 30 items in .staging/
+I also considered auto-approving “high-confidence” items. I no longer treat model confidence as sufficient authority. Automation can be appropriate for reversible, low-consequence state changes, but the boundary should be based on permissions and impact—not on how certain a model sounds.
 
-09:00  Team Lead runs (cron)
-       → Reads staged items
-       → Cloud model synthesizes
-       → Creates CEO briefing
+## What survived
 
-09:05  CEO checks Pending_Approval/
-       → Reviews 1-2 page briefing
-       → Approves/rejects
-       → ~5 minutes of attention
-```
+The hierarchy itself was not the breakthrough. The queue was.
 
-**Total daily cost: ~$0.10 in API calls + 10 minutes of human time**
+A queue created a pause between stages. It gave each worker a bounded input and output. It made partial failure inspectable. It allowed a human to intervene without pretending to supervise every token.
 
-## Why This Works
-
-1. **Cost efficiency**: 90% of work done by free local models
-2. **Quality where it matters**: Cloud models only for synthesis
-3. **Human oversight**: Nothing publishes without approval
-4. **Scalability**: Add collectors for new topics easily
-
-## Adding New Topics
-
-Want to monitor crypto trends? Add a collector:
-
-```python
-class CryptoCollector:
-    def __init__(self):
-        self.model = "ai/gemma3:latest"
-        self.sources = [
-            "https://cointelegraph.com/rss",
-            "https://decrypt.co/feed"
-        ]
-        self.relevance_keywords = ["bitcoin", "ethereum", "defi", ...]
-```
-
-Register with cron, and you're monitoring a new topic.
-
-## Challenges
-
-1. **Local model quality**: gemma3 sometimes misclassifies. We accept ~10% false positives as the cost of running free.
-
-2. **Synthesis coherence**: Team Lead sometimes misses connections. We're iterating on prompts.
-
-3. **Human bottleneck**: CEO approval is still manual. Considering auto-approve for high-confidence items.
-
-## What's Next
-
-- More topic collectors (business, legal, tech)
-- Better quality scoring
-- Auto-approval for routine items
-- Historical trend analysis
+That remains the useful pattern: fewer invisible conversations between agents, more explicit artifacts between bounded steps.
 
 ---
 

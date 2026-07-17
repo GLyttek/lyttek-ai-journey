@@ -1,132 +1,106 @@
-# 10. Novaterra: From Book Project to Story Generation Engine
+# 10 - Novaterra: What a Story Engine Could—and Could Not—Do
 
-> **Status:** Historical creative-system case study. It describes the February 2026 implementation, not the current state of the writing project.
+> **Status:** Historical creative-system case study. Revised in July 2026 after inspecting the retained code, model outputs, comparison report, and generated chapters. It does not describe the current state of the writing project.
 
-*February 2026 - The creative origin of the multi-model architecture*
+*Original experiment: August 2024 · Story-engine build: February 2026*
 
----
+## The book came before the architecture story
 
-## The Genesis Story
+In August 2024, I started experimenting with a post-apocalyptic science-fiction project called “Flasstory.” The world later became Novaterra: humans and AI trying to coexist decades after a destructive war.
 
-In August 2024, I started writing a science fiction novella called "Flasstory" - a post-apocalyptic world where humans and AI learn to coexist after a devastating war. I used local LLMs through a simple RAG setup to help with world-building and consistency checking.
+I used local language models for world-building and draft generation. By February 2026, the experiment had grown into a structured project with a lore bible, character files, a chapter queue, model adapters, generation scripts, and a rule-based consistency checker.
 
-What I didn't realize was that this creative project would become the blueprint for the entire Agent-Workspace multi-model architecture. The patterns I developed for managing character voices, checking lore consistency, and routing different tasks to different models - these became the foundation for the COO Secretary, the Content Pipeline, and the Research Workers.
+The first version of this chapter called Novaterra the blueprint for my entire multi-model workspace. That was too neat. The creative project did exercise patterns I later reused—queues, model comparison, review gates, and structured context—but the wider architecture had several influences and evolved in parallel.
 
-**The book project was the genesis. The automation system was the offspring.**
+## What survives in the project archive
 
-## What We Built
+The retained February 2026 directory contains:
 
-### The Novaterra Story Engine
-
-A complete automated book generation system:
-
-```
+```text
 07_Novella/
-├── LORE_BIBLE.md          # Canonical world reference
-├── CHARACTER_ARCS.md       # Character development + voice guides
-├── CHAPTER_QUEUE.json      # 12 chapters with plot outlines
+├── LORE_BIBLE.md
+├── CHARACTER_ARCS.md
+├── CHAPTER_QUEUE.json
+├── generate_next_chapter.py
+├── generate_multimodel_comparison.py
 ├── engine/
-│   ├── llm_backends.py     # Docker Model Runner + OpenRouter
-│   ├── consistency_checker.py  # Rule-based validation
-│   ├── character_voice.py  # Voice profiles + dialogue generation
-│   └── scene_builder.py    # Scene templates with emotional arcs
+│   ├── llm_backends.py
+│   ├── consistency_checker.py
+│   ├── character_voice.py
+│   ├── scene_builder.py
+│   └── story_generator.py
 ├── characters/
-│   ├── main_cast.json      # 4 main characters
-│   └── supporting_cast.json # Antagonists, AI entities, creatures
-├── generate_next_chapter.py    # Automated pipeline
-└── output/chapters/            # Generated content
+├── output/comparisons/
+└── output/chapters/
 ```
 
-### Key Innovations
+There are nineteen retained chapter files, including revisions, covering twelve distinct chapter numbers. The latest file for each number contains roughly 34,600 words in total. That proves substantial machine-assisted output existed. It does not prove that the result was publication-ready or that every chapter passed human literary review.
 
-1. **Viktor Frankl's Logotherapy as Thematic Framework**
-   Every character embodies one of Frankl's three paths to meaning:
-   - Creative Value (Lucas repairing, Amelia researching)
-   - Experiential Value (Eli's mentorship, Maya's connection)
-   - Attitudinal Value (finding meaning in unavoidable suffering)
+The generation script could read the queue, build prompts from chapter and character data, call a configured model, run checks, save a Markdown chapter, and append a human review checklist. “Automated book generation” was therefore technically real in a narrow sense. Authorship and quality remained unresolved human work.
 
-2. **Multi-Model Comparison for Creative Content**
-   We tested 4+ models on the same scene and compared quality:
+## The creative constraints
 
-   | Model | Provider | Time | Words | Quality |
-   |-------|----------|------|-------|---------|
-   | ministral3 | Docker (local) | 36s | 1520 | Best prose |
-   | gemma3 | Docker (local) | 13s | 989 | Best balance |
-   | gemini-flash | OpenRouter | 9s | 840 | Best speed |
-   | ministral-3b | OpenRouter | 2s | 453 | Drafts only |
+I used an interpretation of Viktor Frankl's paths to meaning as a thematic scaffold:
 
-3. **Automated Consistency Checking**
-   Rule-based validation against the Lore Bible:
-   - Technology constraints (no forbidden tech)
-   - Character voice verification
-   - Timeline consistency
-   - Location/distance validation
+- creative value through making and repairing;
+- experiential value through connection;
+- attitudinal value in the face of unavoidable suffering.
 
-4. **Character Voice Distinction System**
-   Each character has measurable voice patterns:
-   - **Eli**: Longest sentences, metaphorical
-   - **Maya**: Shortest sentences, direct fragments
-   - **Lucas**: Technical jargon + dark humor
-   - **Amelia**: Questions and enthusiasm
+These were writing constraints, not a claim that the engine implemented logotherapy or reproduced Frankl's work completely.
 
-5. **Chapter Queue Pipeline**
-   ```bash
-   python generate_next_chapter.py        # Next chapter
-   python generate_next_chapter.py --all  # All remaining
-   ```
-   Generates → Validates → Saves → Queues for CEO review
+The same was true of character voice. Eli was prompted toward longer, metaphorical speech; Maya toward short, direct fragments; Lucas toward technical language and dark humor; Amelia toward questions and curiosity.
 
-### The World: Novaterra
+The old chapter called those patterns “measurable.” The archive shows explicit voice rules and checks, but no validated metric proving that readers could reliably identify every speaker. The practical test remained human: hide the character name and ask whether the dialogue is still distinguishable.
 
-- **Setting**: Earth, 60 years after the Great AI War
-- **Genre**: Soft Science Fiction (Le Guin + Philip K. Dick style)
-- **Theme**: Meaning through suffering, connection vs isolation
-- **Characters**: 4 main + 7 supporting + 3 AI entities + 4 creature types
-- **Chapters**: 12, ~40,000 words total target
+## One comparison run, not a universal ranking
 
-## Technical Lessons
+On 2 February 2026, the engine generated the same opening scene with four model routes. The retained report recorded:
 
-### What Worked
-- **Docker Model Runner >> Ollama**: Much better memory efficiency for local inference
-- **Narrow and deep worldbuilding**: Focus on 3 categories, go deep
-- **Character voice as quality metric**: If you can't tell who's speaking, rewrite
-- **Viktor Frankl as framework**: Gives every character arc philosophical grounding
+| Model route | Provider | Elapsed time | Output words | Checker flags |
+|---|---|---:|---:|---:|
+| `ministral3` | local Docker Model Runner | 35.8 s | 1,520 | 2 |
+| `gemma3` | local Docker Model Runner | 13.1 s | 989 | 1 |
+| `gemini-2.0-flash` | OpenRouter | 9.4 s | 840 | 1 |
+| `ministral-3b` | OpenRouter | 2.3 s | 453 | 1 |
 
-### What We Learned
-- Local 8B models (ministral3) produce surprisingly literary prose
-- The generation → validation → review pipeline works for creative content
-- Lore consistency checking flags potential world-breaking errors earlier for human review
-- Multi-model comparison reveals each model's creative strengths
+Those figures describe one scene, one machine, one prompt, and one day. They are not current performance benchmarks.
 
-## Connection to the Larger Architecture
+The report gave star ratings and called `ministral3` the best prose. That was my subjective reading, not a blinded evaluation. Longer output may have felt richer while also being slower and, in that run, incomplete at the end. The useful result was not a permanent model leaderboard. It was evidence that the routes produced visibly different drafts worth comparing.
 
-This project validates the pattern used across the Agent-Workspace:
+## What the checker checked
 
-```
-Novaterra Story Engine → Agent-Workspace Architecture
-─────────────────────────────────────────────────────
-Character Voices      → Agent Personalities/Prompts
-Lore Consistency      → Business Rules Validation
-Chapter Queue         → Content Pipeline Queue
-Multi-Model Routing   → LLM Router (04_AI_Tools)
-Quality Review        → CEO Approval Queue
-```
+The `NovaterraConsistencyChecker` was real, but narrower than “validation against the lore bible” implied. Its rules were encoded in Python. It looked for items such as:
 
-The creative work didn't just produce a book - it proved that structured AI-assisted content generation with quality gates and human review can produce genuinely good output.
+- forbidden modern technology terms;
+- a young character claiming pre-war memories;
+- a character acting against a hard-coded physical constraint;
+- too many distant locations appearing in one scene;
+- explicit violations of selected world rules.
 
-## What's Next
+This could catch known contradictions. It could also produce false positives, miss paraphrases, and confuse a mention with an actual story event. A result of “no consistency issues” meant no configured rule fired; it did not mean the chapter was coherent, accurate, or good.
 
-The Novaterra engine is being generalized into a universal book generation framework:
-- Genre templates (Sci-Fi, Fantasy, Non-Fiction, Sachbuch)
-- Fact integration via Perplexity API
-- Human-authentic voice calibration
-- Automated research → outline → draft → review pipeline
+That distinction now shapes how I treat validation elsewhere. A checker should say what it tested, not pronounce the artifact valid.
+
+## What transferred to the wider workspace
+
+Novaterra made four patterns tangible:
+
+**Structured context.** A lore bible and character files worked like domain rules: they made some constraints inspectable instead of leaving everything inside a prompt.
+
+**Queues.** A chapter queue separated planning from generation and made progress visible.
+
+**Model routing.** Different routes could be compared on the same bounded task rather than chosen by reputation alone.
+
+**Human review.** Generated chapters ended in a review state. The system could produce volume; it could not decide whether the prose deserved a reader.
+
+The analogy to business automation has limits. A fictional inconsistency and an incorrect security action do not have the same consequences. Creative freedom is useful in one context and dangerous in the other.
+
+## The honest result
+
+Novaterra did not prove that an automated pipeline could produce a “genuinely good” book. It proved something smaller and more useful: I could turn a world model, a chapter plan, several model backends, and a set of explicit checks into a reproducible drafting workflow.
+
+The archive contains a long machine-assisted manuscript and the machinery that produced it. Whether that manuscript becomes literature depends on selection, rewriting, voice, and judgment beyond the engine.
 
 ---
 
-*"The Ruins are not the enemy. They are the mirror. They show you what you've been carrying."*
-— Eli, Pathfinder of Novaterra
-
----
-
-*Published as part of the [Lyttek AI Journey](https://github.com/GLyttek/lyttek-ai-journey)*
+*Part of the [Lyttek AI Journey](../README.md)*
