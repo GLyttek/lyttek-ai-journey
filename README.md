@@ -1,158 +1,161 @@
 # Lyttek AI Journey
 
-**An engineering journal about building a personal AI automation and decision-support system**
+**A documented personal AI journey — from a WhatsApp conversation with Pi in May 2023 to local models, automation workers, and a bounded human-approved agent system.**
 
-> *"The future isn't only human in the loop. It is AI and humans working with explicit responsibilities, limits, and review gates."*
+I did not begin with an agent architecture. I began by talking to an AI and asking what kind of relationship between people and machines might be useful.
 
-This repository documents the evolution of a private AI workspace since 2024: early experiments, automation workers, agent security, human approval, local models, production failures, and the lessons that followed.
+The first retained source is a private WhatsApp conversation with Pi from May 2023. By March 2024 I was publishing small Python experiments for local models and model APIs. In 2025 those experiments grew into file-based workers and queues. In 2026 the work became less about adding autonomy and more about evidence, permissions, failure recovery, and knowing when a deterministic script is the better tool.
 
-The production workspace itself is **not published here**. This is a documentation and case-study repository containing sanitized architecture notes, selected code excerpts, training material, and local benchmark observations. It should not be read as a ready-to-deploy agent framework.
+This repository preserves that development without pretending it was a straight line.
 
-## Start Here
+## What this repository is
 
-- New to the project: read [01 - Genesis](docs/01_genesis.md), [05 - Lessons Learned](docs/05_lessons_learned.md), and [11 - Production Reality Check](docs/11_production_reality_check.md).
-- Interested in the current agent direction: read [09 - Aletheia](docs/09_aletheia_local_agent.md).
-- Interested in local inference and AMD ROCm: read [12 - Bonsai 1-bit Local Deployment](docs/12_bonsai_1bit_local_deployment.md).
-- Interested in training material: see the [workshop](workshops/AI_Agents_Workshop_Outline.md) and training video below.
+This is a documentation and case-study repository. It contains:
 
-## Repository Scope
+- dated reflections on the ideas and systems I was testing;
+- selected and sanitized code excerpts;
+- links to publicly verifiable experiments;
+- local observations with their limitations;
+- corrections where later evidence changed my assessment.
 
-This repository is intended to show:
+The private production workspace, personal data, credentials, and raw source archives are not published here. The repository is not a supported agent framework, an audited security product, or a deployment guide.
 
-- which architectural decisions were made and why;
-- which assumptions failed under real end-to-end use;
-- how human approval, local inference, and cloud models were combined;
-- where security and operational controls were initially insufficient;
-- how the system changed over time.
+## Timeline and evidence
 
-It does **not** provide:
+| Period | What I was doing | Evidence available to a reader |
+|---|---|---|
+| **May 2023–Jan 2025** | Talking with Pi about trust, memory, bias, hallucinations, care, attachment, and AI as a ferryman rather than an authority | [Public reflection](docs/prologue_pi_2023.md), based on a private retained WhatsApp export |
+| **Feb–Apr 2024** | Comparing local-model output, calling Claude and Groq from Python, transcribing audio, and building rough RAG and document pipelines | Public commits in [`GLyttek/myscripts`](https://github.com/GLyttek/myscripts) plus private local artifacts |
+| **Aug 2024–Feb 2025** | Exploring MITRE extraction, retrieval, prompt chains, tool loops, and model routing | [Early experiments](docs/00_prequel_experiments.md) and [pattern review](docs/08_early_llm_patterns.md); cleaned examples were published later |
+| **Oct–Dec 2025** | Turning scripts into file-based queues, workers, dashboards, and approval folders | [Genesis](docs/01_genesis.md) and [First Automation](docs/02_first_automation.md) |
+| **Jan–Feb 2026** | Adding security controls, multiple model roles, Aletheia, and a local command-center prototype | Chapters [03](docs/03_security_evolution.md) through [11](docs/11_production_reality_check.md) |
+| **Apr–Jul 2026** | Testing local deployment, replacing brittle agentic jobs with bounded scripts, and moving Aletheia into Hermes Agent | [Bonsai deployment](docs/12_bonsai_1bit_local_deployment.md), [bounded research](docs/13_bounded_research_scripts.md), and [Current State](CURRENT_STATE.md) |
 
-- the private production workspace or its data;
-- a supported software distribution;
-- independently audited security controls;
-- benchmark results that generalize beyond the documented hardware and test conditions.
+The earliest public code evidence is the [`myscripts` repository](https://github.com/GLyttek/myscripts), created on 2 March 2024. Its 2024 history includes:
 
-## Current State
+- a [local-model comparison script](https://github.com/GLyttek/myscripts/commit/080422481e981934c573f36fb41d3624aa7900d9);
+- a [Claude API document experiment](https://github.com/GLyttek/myscripts/commit/0b19f0669b38ef0de03352d0a76de269122d5f00);
+- a [Groq/Mixtral chatbot](https://github.com/GLyttek/myscripts/commit/ef2bffa9de363ee6660221c37c57d8fbef98e5ab);
+- a [local Whisper and API summarization pipeline](https://github.com/GLyttek/myscripts/commit/50e128f7453da379feda240ead4cb633688394fd).
 
-**Documentation state:** April 2026
+These are learning artifacts. They contain rough edges and should not be read as current implementation advice. The later `llm-experiments/` collection in that repository was cleaned up and added in 2026; its current location is not evidence that the same published files existed in 2024.
 
+## Choose a reading path
+
+- **Origin and intent:** [The Ferryman Before the System](docs/prologue_pi_2023.md) → [Early Experiments](docs/00_prequel_experiments.md) → [Genesis](docs/01_genesis.md)
+- **Automation and failure:** [First Automation](docs/02_first_automation.md) → [Lessons Revisited](docs/05_lessons_learned.md) → [Production Reality Check](docs/11_production_reality_check.md)
+- **Aletheia and human control:** [Aletheia](docs/09_aletheia_local_agent.md) → [Current State](CURRENT_STATE.md)
+- **Local models and reliability:** [Early LLM Patterns](docs/08_early_llm_patterns.md) → [Bonsai 1-bit Deployment](docs/12_bonsai_1bit_local_deployment.md) → [When Agentic Research Needed Less Agency](docs/13_bounded_research_scripts.md)
+
+## Current state
+
+**Snapshot:** 16 July 2026<br>
 **Repository review:** July 2026
 
-The most recent documented architecture combines:
+[Current State](CURRENT_STATE.md) describes what I actually use now. Hermes Agent is the active harness for conversations, skills, tools, memory, scheduled work, and execution receipts. Aletheia continues as a persona and co-pilot role inside Hermes rather than as the standalone command-center application described in Chapter 09.
 
-- local collectors and worker processes for bounded tasks;
-- cloud models for selected synthesis and review work;
-- Markdown and Obsidian as the human-readable knowledge layer;
-- explicit approval queues for consequential actions;
-- a local Aletheia command center for workspace visibility;
-- Docker-based local inference experiments.
+The project remains a proof of concept. The recurring value today is research support, structured collaboration, learning, and bounded execution after review. It is not an autonomous production platform.
 
-Earlier chapters are historical snapshots. Statements such as “current,” “production ready,” or “what comes next” describe the state at the chapter date and may be superseded by later chapters.
+## Evidence convention
 
-## Guiding Principles
+Public claims in this repository should fit one of four categories:
 
-1. **Human responsibility remains explicit:** AI can propose, analyze, and execute bounded tasks; humans retain accountable decisions.
-2. **Cost follows task complexity:** use local models for suitable volume work and cloud models only where their capability adds value.
-3. **Security is architectural:** prompt boundaries alone are not a security control; permissions, isolation, validation, logging, and approval gates matter.
-4. **Practical over performative:** end-to-end evidence matters more than clean diagrams or “production ready” labels.
-5. **Document corrections:** failed assumptions and superseded designs remain visible as part of the engineering record.
+- **Observed:** output, failure, or measurement from a documented local run.
+- **External:** a claim attributed to a linked primary or vendor source.
+- **Interpretation:** my conclusion from observed or external material.
+- **Recommendation:** a proposed practice, not a measured result.
+
+There is also a necessary visibility distinction:
+
+- **Public evidence** can be opened by an unauthenticated reader.
+- **Private archival evidence** is retained locally but withheld for privacy or security.
+- **Historical recollection** is identified as recollection when no stronger artifact remains.
+
+Older chapters did not always make these boundaries explicit. The July 2026 editorial pass narrowed unsupported claims and added dated correction notes without hiding the original sequence of work.
+
+## Principles that survived the experiments
+
+1. **Human responsibility stays explicit.** Models can propose, analyze, or execute bounded tasks. Values, publication, money, rights, risk acceptance, and decisions affecting other people remain human decisions.
+2. **A model response is not evidence of success.** The output still needs source checks, validation, or an end-to-end test appropriate to the task.
+3. **Security belongs in the architecture.** Prompt wording alone cannot provide isolation, least privilege, safe tool use, auditability, or approval boundaries.
+4. **Use the least complex mechanism that works.** A deterministic script is often more reliable than an agent for collection, thresholds, file checks, and repeatable transformations.
+5. **Preserve corrections.** Failed assumptions are part of the engineering record, not material to be edited out after the fact.
 
 ## Documentation
 
 | Chapter | Period | Description | Status |
 |---|---|---|---|
-| [00 - Prequel: Early Experiments](docs/00_prequel_experiments.md) | Aug 2024 | Experiments that laid the foundation | Historical snapshot |
-| [01 - Genesis](docs/01_genesis.md) | Oct 2025 | How the workspace started with Claude Code | Historical snapshot |
-| [02 - First Automation](docs/02_first_automation.md) | 2025 | Building the first workers and queues | Historical snapshot |
-| [03 - Security Evolution](docs/03_security_evolution.md) | Jan–Feb 2026 | Prompt injection, cost controls, and audit gaps | Historical; corrections added |
-| [04 - Multi-Agent Architecture](docs/04_multi_agent.md) | Feb 2026 | Hierarchical agents with local and cloud models | Historical snapshot |
-| [05 - Lessons Learned](docs/05_lessons_learned.md) | Feb 2026 | What worked and what did not | Historical; later chapters supersede parts |
-| [06 - AI Agents Training](docs/06_ai_agents_training.md) | Feb 2026 | Reliability, validation, safety, and regulation | Training snapshot; corrections added |
-| [07 - ACE Framework Exploration](docs/07_ace_framework_exploration.md) | Feb 2025 | Exploration of a layered agent architecture | Historical snapshot |
-| [08 - Early LLM Patterns](docs/08_early_llm_patterns.md) | Aug 2024–Feb 2025 | Chain prompting, RAG, ReAct, and orchestration | Historical snapshot |
-| [09 - Aletheia](docs/09_aletheia_local_agent.md) | Feb 2026 | From local reflection agent to command center | Historical architecture snapshot |
-| [10 - Novaterra Story Engine](docs/10_novaterra_story_engine.md) | Feb 2026 | Multi-model story generation experiment | Historical snapshot |
-| [11 - Production Reality Check](docs/11_production_reality_check.md) | Feb 2026 | Infrastructure hardening and PDCA verification | Verified case-study snapshot |
-| [12 - Bonsai 1-bit Local Deployment](docs/12_bonsai_1bit_local_deployment.md) | Apr 2026 | AMD ROCm deployment and local benchmark | Single-machine case study |
+| [Prologue — The Ferryman Before the System](docs/prologue_pi_2023.md) | May 2023–Jan 2025 | Early conversations about trust, memory, care, and AI as a ferryman | Historical reflection |
+| [00 — From Conversation to Code](docs/00_prequel_experiments.md) | Feb–Aug 2024 | Local models, APIs, RAG, and document-generation experiments | Historical evidence review |
+| [01 — Genesis](docs/01_genesis.md) | Oct 2025 | How the workspace started with Claude Code | Historical snapshot |
+| [02 — First Automation](docs/02_first_automation.md) | Nov–Dec 2025 | File-based workers, dashboards, queues, and early routing | Historical evidence review |
+| [03 — Security Evolution](docs/03_security_evolution.md) | Jan–Feb 2026 | Prompt injection, cost controls, and audit gaps | Historical; corrections added |
+| [04 — Multi-Agent Architecture](docs/04_multi_agent.md) | Feb 2026 | Hierarchical agents with local and cloud models | Historical snapshot |
+| [05 — Lessons Revisited](docs/05_lessons_learned.md) | Feb 2026 / Jul 2026 | What survived later operational use and what did not | Historical reflection with corrections |
+| [06 — AI Agents Training](docs/06_ai_agents_training.md) | Feb 2026 | Reliability, validation, safety, and regulation | Training snapshot; corrections added |
+| [07 — ACE Framework Exploration](docs/07_ace_framework_exploration.md) | Feb 2025 | Exploration of a layered agent architecture | Historical snapshot |
+| [08 — Early LLM Patterns Revisited](docs/08_early_llm_patterns.md) | Aug 2024–Feb 2025 | Prompt chains, RAG, tool loops, and routing under review | Historical pattern review |
+| [09 — Aletheia](docs/09_aletheia_local_agent.md) | Feb 2026 / Jul 2026 | Standalone prototype, audit findings, and transition into Hermes | Historical architecture review |
+| [10 — Novaterra Story Engine](docs/10_novaterra_story_engine.md) | Feb 2026 | Multi-model story generation experiment | Historical snapshot |
+| [11 — Production Reality Check](docs/11_production_reality_check.md) | Feb 2026 | Infrastructure hardening and PDCA verification | Verified case-study snapshot |
+| [12 — Bonsai 1-bit Local Deployment](docs/12_bonsai_1bit_local_deployment.md) | Apr 2026 | AMD ROCm deployment and local benchmark | Single-machine case study |
+| [13 — When Agentic Research Needed Less Agency](docs/13_bounded_research_scripts.md) | Jul 2026 | Replacing brittle model-driven research crons with bounded scripts | Verified local case-study snapshot |
 
-## Evidence Convention
-
-The documents use four evidence categories:
-
-- **Observed:** output, failure, or measurement from the documented local system.
-- **External:** claim supported by a linked primary or vendor source.
-- **Interpretation:** conclusion drawn from observations or external material.
-- **Recommendation:** a proposed practice, not a measured fact.
-
-Older chapters did not always separate these categories clearly. Correction notes now identify important limitations. Numbers without a linked methodology or source should be treated as local observations or author assessments, not universal benchmarks.
-
-## Architecture Overview
+## Responsibility flow
 
 ```text
-┌─────────────────────────────────────────────────────────────────┐
-│ Human owner                                                     │
-│ Accountable decisions · approvals · priorities · risk acceptance│
-├─────────────────────────────────────────────────────────────────┤
-│ Review and synthesis                                            │
-│ Selected cloud/local models · quality checks · routing          │
-├─────────────────────────────────────────────────────────────────┤
-│ Bounded workers                                                 │
-│ Collection · transformation · monitoring · local inference      │
-├─────────────────────────────────────────────────────────────────┤
-│ Human-readable state                                            │
-│ Markdown · Obsidian · queues · logs · documented decisions      │
-└─────────────────────────────────────────────────────────────────┘
+Question, local material, or public source
+                    |
+                    v
+       Bounded tool, script, or model
+                    |
+        +-----------+-----------+
+        |                       |
+        v                       v
+ Operational evidence      Human-readable context
+ and execution receipt     and working notes
+        |                       |
+        +-----------+-----------+
+                    |
+                    v
+               Human review
+                    |
+                    v
+       Optional bounded action or publication
 ```
 
-The diagrams and code excerpts describe the system at specific points in time. They are not a deployment specification.
+The diagram describes responsibility, not a deployable architecture. Historical chapters contain more specific diagrams for the systems that existed at those dates.
 
-## Training Materials
+## Security notice
 
-- **[AI Agents Workshop](workshops/AI_Agents_Workshop_Outline.md)** — half-day and full-day workshop outline
-- **[Training Video](https://youtu.be/64qeuW15J8g)** — presentation on YouTube
+Some historical examples contain approaches that later proved incomplete:
 
-The editable slide source is retained privately rather than versioned as a large binary asset. Its claims and references need a fresh review before a future, accessible HTML edition is considered for [lyttek.org](https://lyttek.org).
-
-## Research and Whitepapers
-
-| Paper | Original year | Topic | Follow-up |
-|---|---:|---|---|
-| [Redefining Efficiency in AI](whitepapers/Redefining%20Efficiency%20in%20AI%20The%20Impact%20of%201.58-bit%20LLMs%20on%20the%20Future%20of%20Computing.pdf) | 2024 | BitNet b1.58 and low-bit inference | [2026 retrospective](whitepapers/1_58_bit_llm_retrospective_2026.md) |
-
-## Related Repositories
-
-- **[myscripts](https://github.com/GLyttek/myscripts)** — public Python utilities and cleaned-up experiments
-
-## Influences and Terminology
-
-The project explored or referenced:
-
-- [David Shapiro's ACE Framework](https://github.com/daveshap/ACE_Framework)
-- [OpenAI Agent Swarm / HAAS](https://github.com/daveshap/OpenAI_Agent_Swarm)
-- [GATO Framework](https://github.com/daveshap/GATO_Framework)
-
-`GATO` is an external influence. `GOTCHA`, used in some historical chapters, was an internal security mnemonic rather than an industry standard. The public documentation now labels that distinction explicitly.
-
-## Security Notice
-
-The repository contains historical security approaches that were later found to be incomplete. In particular:
-
-- regex detection and prompt delimiters do not neutralize prompt injection;
-- local-only services still need deliberate binding, authentication, and browser-origin controls;
-- agent safety depends on capability limits and approval boundaries, not only model instructions;
-- Docker examples require image, source, and model pinning before they are reproducible or supply-chain hardened.
+- regex checks and prompt delimiters do not neutralize prompt injection;
+- generated classifications and scores are not self-validating;
+- local services still need deliberate binding, authentication, and browser-origin controls;
+- tool-using agents need capability limits and commit-time approval for consequential effects;
+- model and container examples need pinned sources, revisions, and reproducible tests.
 
 Do not deploy excerpts unchanged in a sensitive environment.
 
-## Repository Checks
+## Training, research, and related work
 
-Run the local documentation checks with:
+- [AI Agents Workshop](workshops/AI_Agents_Workshop_Outline.md) — historical workshop outline; claims need review before reuse
+- [Training video](https://youtu.be/64qeuW15J8g) — presentation snapshot
+- [Redefining Efficiency in AI](whitepapers/Redefining%20Efficiency%20in%20AI%20The%20Impact%20of%201.58-bit%20LLMs%20on%20the%20Future%20of%20Computing.pdf) — 2024 paper with a [2026 retrospective](whitepapers/1_58_bit_llm_retrospective_2026.md)
+- [`GLyttek/myscripts`](https://github.com/GLyttek/myscripts) — public Python experiments and utilities
+
+External influences referenced in historical chapters include David Shapiro's [ACE Framework](https://github.com/daveshap/ACE_Framework), [OpenAI Agent Swarm / HAAS](https://github.com/daveshap/OpenAI_Agent_Swarm), and [GATO Framework](https://github.com/daveshap/GATO_Framework). `GOTCHA` was an internal security mnemonic, not an industry standard.
+
+## Repository checks
+
+Run:
 
 ```bash
 python3 scripts/check_docs.py
 ```
 
-The check verifies local Markdown links and confirms that every numbered chapter is indexed in this README.
+The check validates local Markdown links and confirms that every numbered chapter is indexed here.
 
 ## License
 
@@ -160,4 +163,4 @@ MIT License — see [LICENSE](LICENSE).
 
 ## About Lyttek
 
-Lyttek documents practical work at the intersection of IT security, local AI, automation, and human decision-making. The focus is not autonomous operation at any cost, but systems whose boundaries and operational consequences remain visible.
+Lyttek documents practical work at the intersection of IT security, local AI, automation, and human decision-making. I am interested in what survives contact with real workflows: what helps, what fails, and which decisions must remain visibly human.

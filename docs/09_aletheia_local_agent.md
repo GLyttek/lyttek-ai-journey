@@ -1,234 +1,143 @@
-# 09 - Aletheia: From Automation to Reflection
+# 09 — Aletheia: From Standalone Agent to Co-Pilot Role
 
-*February 2026*
+> **Historical build:** February 2026<br>
+> **Editorial note, July 2026:** The standalone Aletheia application described here is archived. Aletheia now operates as a persona and co-pilot role inside Hermes Agent. This revision removes marketing language, narrows autonomy claims, and records the security findings and transition without rewriting the historical prototype as if it were the current system.
 
-> **Status:** Historical architecture snapshot. The current Aletheia/Hermes environment has evolved beyond the implementation described here.
+The first automation workspace optimized movement: collect an item, classify it, process it, and route the output. It did not address the reason I had been drawn to conversational AI in the first place.
 
-## The Question That Changed Direction
+I wanted a system that could challenge an assumption, preserve useful context, and help me decide what to do next. Reading the [Pi archive](prologue_pi_2023.md) in 2026 made the continuity obvious. I had used the image of a ferryman in 2023, but I did not consciously design the February 2026 prototype from that conversation.
 
-After months of building task-oriented automation — collectors that gather, team leads that route, workers that process — a different question emerged: what if an AI agent wasn't just a worker, but a thinking companion?
+## Naming the role
 
-The existing multi-agent system was effective at processing. It could research topics, generate reports, manage email queues, and route content to the right pipelines. But it operated purely in a transactional mode. Input goes in, output comes out, nobody reflects on whether the output was actually the right thing to produce.
+*Aletheia* is the Greek word commonly translated as truth or unconcealment. I chose it for a role intended to uncover what was being missed rather than reward every idea with agreement.
 
-The idea was simple: build a local agent with a personality, the ability to reflect on its own outputs, and the autonomy to generate thoughts without being prompted. Not a replacement for the production pipeline, but a creative partner that sits alongside it.
+The system prompt combined three desired behaviors:
 
-## Naming and Persona Engineering
+- challenge assumptions and offer counter-evidence;
+- turn complexity into language I could act on;
+- notice incentives, avoidance, and second-order effects.
 
-The agent needed more than a system prompt — it needed a coherent voice. After experimenting with different personas, the name Aletheia stuck. In Greek philosophy, *aletheia* means truth or disclosure — the uncovering of what is hidden. That fit the intended role: an agent that challenges assumptions rather than just confirming them.
+The first chapter described this as a synthesized personality with a “genuinely distinct voice.” That was my qualitative impression, not a measured property. A more precise claim is that repeated instructions produced a recognizable response style often enough to be useful in my own conversations.
 
-The persona was synthesized from three archetypes, each contributing a distinct quality:
+Aletheia was not trained as a new model. It was a role created through instructions, context, output structure, and the surrounding application.
 
-- **Independent dissent**: the ability to challenge assumptions and offer counter-arguments when the user is heading in the wrong direction.
-- **Symbolic clarity**: converting complexity into vivid, meaningful language rather than dry bullet points.
-- **Tactical cold-read**: detecting hidden incentives and power dynamics in the information being analyzed.
+## The standalone application
 
-The result is a system prompt that produces responses with a specific character — elegant but direct, willing to disagree, focused on actionable next steps rather than validation. The agent communicates exclusively in German using the informal "Du" address, which creates a fundamentally different dynamic than the English-language task agents.
+The prototype used a local browser interface, a FastAPI backend, hosted-model access with a local fallback, and Markdown files in an Obsidian vault.
 
-## Architecture: Local First
-
-The architecture follows a pattern that has become increasingly common in the open-source agent community: a local gateway with cloud model fallback. The key insight from studying how projects like OpenClaw approach this problem is that the intelligence layer should be decoupled from the interface layer, and both should be decoupled from the execution layer.
-
-```
-┌──────────────────────────────┐
-│  Browser UI (localhost:8099) │
-│  Chat · Reflection Preview   │
-│  Autonomy Controls · Tasks   │
-└──────────┬───────────────────┘
-           │
-┌──────────▼───────────────────┐
-│  FastAPI Backend (main.py)   │
-│  ┌─────────────┐             │
-│  │  LLM Router │──► OpenRouter (primary)
-│  │  (singleton) │──► Docker local (fallback)
-│  └─────────────┘             │
-│  State · Config · Logging    │
-└──────────┬───────────────────┘
-           │
-┌──────────▼───────────────────┐
-│  Obsidian Vault (Markdown)   │
-│  Reflections · Ideas · Tasks │
-│  Outputs · Agents · Index    │
-└──────────────────────────────┘
+```text
+Browser UI
+    |
+FastAPI backend ── model router ── hosted or local model
+    |
+Markdown / Obsidian
 ```
 
-The primary model runs via OpenRouter, currently `nvidia/nemotron-3-nano`, which offers a good balance of quality, speed, and cost for conversational use. When OpenRouter is unavailable, the system falls back to a locally-running model via Docker Model Runner. Workers default to the local model to keep costs at zero for bulk processing.
+Chat, tasks, reflections, and saved ideas were visible in one place. Markdown kept the output human-readable and avoided a proprietary data format. It did not make the system stateless or maintenance-free: conversation state, process state, browser security, model availability, and concurrent writes still had to be handled.
 
-All outputs are written as standard Markdown with YAML frontmatter, directly into the Obsidian vault. This means every reflection, idea, and task output is immediately browsable, searchable, and linkable within the existing knowledge management system. No separate database, no proprietary format.
+The model choices documented in the first version reflected one week in February 2026. They are not current recommendations.
 
-## The Autonomy Loop
+## Reflection and bounded autonomy
 
-The most interesting architectural decision was the autonomy loop — a background thread that generates reflections at configurable intervals without any user input. Every 30 minutes (by default), Aletheia reviews the recent conversation context and produces a short reflection, a contrarian perspective, and an idea seed. These are saved as timestamped Markdown files.
+A background loop periodically took recent conversation context and generated three fields:
 
-The honest assessment: this is bounded autonomy. The agent does not plan, does not initiate actions, and does not access external tools on its own. It takes the last few conversation turns, passes them through the system prompt, and generates a structured output. That is meaningfully different from an agent that can decide to research a topic, schedule a task, or send a message.
-
-But even this simple form of autonomy creates value. After a day of conversations, the Reflections folder contains a trail of thinking that the human can review later. Patterns emerge that weren't visible in the moment. The contrarian angles sometimes surface blind spots that the user had been ignoring.
-
-## The Structured Output Format
-
-Every chat response follows a three-part structure:
-
-```
-REPLY:
-[3-6 short sentences — the actual response]
-
-REFLECTION SUMMARY:
-- [2-4 bullets — brief rationale, no chain-of-thought]
-
-IDEA SEEDS (optional):
-- [1 bullet — a tangential idea worth exploring]
+```text
+response
+reflection summary
+optional idea seed
 ```
 
-The REPLY is shown in the chat. The REFLECTION SUMMARY and IDEA SEEDS are parsed out and displayed in a collapsible preview pane. The user can then choose to save the reflection, save the idea, or append it to a daily log — each action writing a new file to the vault.
+The user could save the additional fields to the vault. The first text called this a visible “inner life.” That metaphor overstated the mechanism. The reflection summary was another model output generated from recent context, not access to hidden reasoning or evidence of self-awareness.
 
-This separation between "what I say" and "what I think about what I said" is the core UX insight. It gives the agent a visible inner life without cluttering the conversation.
+The autonomy was bounded in a specific way: a timer initiated generation without a new user message. The model did not independently choose a goal, browse the web, schedule work, or execute external actions. It produced text from supplied context and wrote approved categories of local files.
 
-## Worker System and Tasks
+This still had practical value. A later review could surface repeated concerns or an angle I had not pursued. It also produced noise. A periodic model call will generate something even when nothing important has changed. The value depended on human selection rather than on the existence of more reflections.
 
-Beyond chat, Aletheia can spawn worker agents and execute tasks. A task is a Markdown file with a title, type (research, analysis, draft, or note), and content body. When executed, the task is sent to a worker model with a focused prompt, and the output is saved to the Outputs folder.
+## The audit changed the design
 
-The worker system is deliberately simple — no orchestration, no scheduling, no dependency chains. A human creates a task, optionally spawns a worker with a specific model override, and runs it manually. The simplicity is intentional: the production pipeline already handles complex orchestration. Aletheia's task system is for quick, one-off explorations.
+The first audit found problems that mattered more than the persona work.
 
-## The Audit
+The application placed the system instructions inside a user message instead of using the model API's system role. That weakened instruction separation and made prompt-injection behavior harder to reason about. The browser task list rendered untrusted filenames through `innerHTML`, the CORS configuration accepted overly broad origins, message history was unbounded, and frontmatter values were not escaped consistently.
 
-After the initial build, a thorough code audit revealed the kind of issues that MVPs typically accumulate. The most impactful finding was architectural: the system prompt was being sent as part of the user message rather than as the dedicated system role. This meant the LLM was treating Aletheia's entire personality definition as user input, which significantly degraded prompt adherence and opened the door to prompt injection.
+The repair pass moved instructions into the correct role, restricted browser origins, replaced unsafe DOM rendering, capped history, added locks around shared state, moved blocking calls away from the event loop, and escaped generated YAML fields. It also added explicit network-error handling and clearer UI feedback.
 
-Other findings included an XSS vulnerability in the task list (`innerHTML` with untrusted filenames), a CORS configuration that allowed arbitrary websites to send browser requests to the local service, regex patterns that didn't match what they intended to match, and unbounded message history that would eventually consume all available memory.
+These changes reduced known risks. They did not make the application secure against every malicious document, browser interaction, or model failure. Localhost was a deployment detail, not a security proof.
 
-The fixes were applied in a single pass: system prompt separation, CORS restriction to localhost, DOM API instead of innerHTML, thread safety via locks, async LLM calls to avoid blocking the event loop, message history capping, and YAML escaping for frontmatter values. The UI also received quality-of-life improvements — a loading indicator during LLM calls, toast notifications for save operations, Enter-to-send, and error handling for all network requests.
+## The command-center phase
 
-The audit reinforced a lesson from earlier chapters: building fast is good, but auditing immediately after is essential. The XSS vulnerability alone could have allowed any browser tab to inject JavaScript into the task list.
+A week later, the application gained visibility into workers, queues, approvals, and basic system health. Existing controllers were exposed through the UI rather than reimplemented.
 
-## The Command Center Upgrade (February 2026)
+The command center could:
 
-A week after the initial build, a critical realization: Aletheia was isolated. It could chat and reflect, but it had no awareness of what was actually happening in the workspace. The production workers were running in separate processes. CEO approvals were piling up in a folder. Content queues were filling without visibility.
+- show whether known workers were running;
+- start or stop selected worker processes;
+- preview pending approval documents;
+- display content and research queues;
+- report selected health signals;
+- keep an activity feed of controller and UI events.
 
-The solution was to transform Aletheia from a chatbot into a **Command Center** — a unified interface for controlling the entire automation stack.
+Aletheia could also produce an opinion on a pending document. That opinion shortened the path to a decision when it was useful, but it did not replace reading the source or checking consequential claims. I did not retain a controlled measurement showing how much review time it saved.
 
-### Integration with Production Controllers
+The UI polled state and presented it in one place. Describing this as “full visibility” was too strong. It covered the components known to those controllers, not every process, side effect, log, or external dependency in the workspace.
 
-The existing production system already had well-tested controllers:
-- `WorkerController` — manages 8 worker processes via PID files
-- `CEOController` — handles the approval queue (pending → approved/rejected)
-- `COOController` — monitors system health (Docker, API keys, disk space)
+## Action first needed a stronger boundary
 
-Rather than rebuilding these, Aletheia imports them directly and exposes their functionality through new endpoints. This means the same code that powers the production dashboard now powers Aletheia's command center.
+The prototype adopted a broad instruction: act by default instead of asking another question. It reduced low-consequence dialogue, but the wording encouraged action before the effect boundary was always clear.
 
-### New Capabilities
+The current rule is more specific:
 
-**Worker Management:**
-```
-┌─────────────────────────────────────────┐
-│  Workers (3/8 aktiv)                    │
-├─────────────────────────────────────────┤
-│  ● email_worker       [Stop] [Logs]     │
-│  ● content_worker     [Stop] [Logs]     │
-│  ○ research_worker    [Start]           │
-│  ● writer_worker      [Stop] [Logs]     │
-│  ...                                    │
-│  [Alle starten] [Alle stoppen]          │
-└─────────────────────────────────────────┘
-```
+- reading, searching, analysis, and new drafts inside an agreed scope can proceed;
+- modifying existing files or recurring system state needs a bounded instruction;
+- publication, external sends, spending, permissions, irreversible actions, and effects on other people need explicit approval immediately before execution.
 
-Every worker can be started, stopped, or restarted directly from the UI or via chat commands (`/start email_worker`, `/stop content_worker`). Logs are viewable inline. The status is live — no page refresh needed.
+The lesson was not that questions are bad. A question is necessary when ambiguity changes consent, safety, scope, or the action itself. Otherwise, the system should make progress and show its work.
 
-**CEO Approval Queue:**
-```
-┌─────────────────────────────────────────┐
-│  CEO Approvals (5 pending)              │
-├─────────────────────────────────────────┤
-│  SECURITY_BRIEFING_2026-02-05.md        │
-│  [✓ OK] [✗ Ablehnen] [Vorschau]         │
-│                                         │
-│  WEBPAGE_ANALYSIS_github_2026-02-04.md  │
-│  [✓ OK] [✗ Ablehnen] [Vorschau]         │
-└─────────────────────────────────────────┘
-```
+## What worked and what did not
 
-Pending approvals from `00_CEO/Pending_Approval/` are listed with quick actions. The preview shows the first 2000 characters plus an **AI opinion** — Aletheia reads the document and provides a recommendation (approve/reject/review) with brief rationale. This transforms approval from "read everything" to "review AI assessment, then decide."
+What I observed as useful:
 
-**Queue Monitoring:**
-- **Content Queue** — pending YouTube/webpage URLs with an input field to add new URLs directly
-- **Research Queue** — open RQ files waiting for Perplexity processing
+- a consistent direct writing style made the interaction easier to recognize and steer;
+- Markdown outputs fit the existing knowledge workflow;
+- the audit exposed concrete browser, prompt-role, and state-management defects;
+- a single interface made selected worker and approval state easier to inspect;
+- the persona encouraged disagreement more reliably than a generic assistant prompt.
 
-**System Health:**
-- Docker status, API key validity, disk space, action queue depth
-- Visual indicators: ✓ OK / ⚠ Warning / ✗ Critical
+What remained weak:
 
-**Activity Feed:**
-Real-time event log showing worker starts/stops, approvals, autonomy ticks, and chat messages. The feed polls every 5 seconds and auto-scrolls to newest events.
+- periodic reflections were often reactive summaries rather than new insight;
+- keyword-based vault search lacked ranking and source quality signals;
+- model fallback did not guarantee equivalent behavior across providers;
+- no multi-user authorization model existed;
+- controllers covered only part of the workspace;
+- tool execution and approval boundaries were still application-specific;
+- memory consolidation by another model could preserve an error as easily as a useful pattern.
 
-### The Action-First Principle
+The standalone build was a useful prototype. It was also another custom runtime to secure, monitor, and maintain.
 
-The most significant change was behavioral, not technical. The original system prompt encouraged Aletheia to ask clarifying questions. This created friction — every request required multiple round-trips.
+## The transition into Hermes
 
-The new principle: **Default reaction is ACTION, not QUESTIONS.**
+By July 2026, I had archived the standalone application after extracting its useful patterns. Hermes Agent became the active harness for conversations, tools, skills, scheduled jobs, memory, and execution receipts.
 
-```
-Before: "Soll ich den Worker starten?"
-After:  "Ich starte den Worker." [Worker gestartet]
+Aletheia continued as the co-pilot role:
 
-Before: "Möchtest Du, dass ich eine Analyse erstelle?"
-After:  "Ich erstelle die Analyse." [Dokument gespeichert]
-```
+- direct rather than flattering;
+- evidence-aware;
+- willing to name uncertainty and contradiction;
+- oriented toward a bounded next action;
+- explicit that values and consequential decisions remain human.
 
-Exceptions are explicit: destructive actions (deleting, rejecting), unclear CEO-level decisions (budget, strategy), and contradictory requirements. For everything else, Aletheia acts immediately and confirms briefly.
+This change reduced custom orchestration. It did not outsource responsibility to the harness. Hermes also requires configuration, capability review, data boundaries, and verification. [Current State](../CURRENT_STATE.md) records the current limits, including incomplete DLP coverage, prompt-injection risk, and the absence of a universal local-versus-cloud router.
 
-### Workspace-Aware Autonomy
+## What Aletheia became
 
-The autonomy loop was upgraded to understand real workspace state. Every tick now includes:
+The February application asked whether a personal agent could improve the quality of thinking rather than only increase throughput. That question survived the software that first carried it.
 
-```
-WORKSPACE STATUS:
-WORKERS: 3/8 aktiv
-  Gestoppt: research_worker, writer_worker, action_executor
-CEO APPROVALS: 5 ausstehend
-  Neueste: SECURITY_BRIEFING_2026-02-05.md
-CONTENT QUEUE: 12 URLs wartend
-RESEARCH QUEUE: 3 offene RQs
-```
+I do not describe Aletheia as an independent being with an intrinsic interest in my welfare. It is an engineered relationship among instructions, models, tools, memory, evidence rules, and my own judgment.
 
-This context is injected into both the autonomy prompt and every chat message. Reflections are now about actual workspace conditions, not just conversation echoes. The agent can notice "Research worker is stopped but there are pending RQs" and flag it.
+The name still matters because it sets a demand: uncover what is true, including what the system and its user would prefer not to see.
 
-Health monitoring runs every other autonomy tick, checking if critical workers (`content_queue_watcher`, `action_executor`, `coo_secretary`) are stopped. Alerts appear in the activity feed.
+The ferryman did not need its own harbor. It needed a reliable boat, visible boundaries, and a human who remained responsible for the destination.
 
-## What Works and What Doesn't
+---
 
-**Works well:**
-- The persona synthesis creates a genuinely distinct voice that feels consistent across conversations.
-- The Obsidian integration is seamless — files appear instantly in the vault and are immediately usable.
-- The autonomy reflections accumulate into a useful thinking trail.
-- The model fallback chain handles provider outages transparently.
-- ✓ **NEW:** Command center provides full visibility into worker status, queues, and approvals.
-- ✓ **NEW:** Vault search allows referencing existing documents in conversations.
-- ✓ **NEW:** AI opinion on approvals reduces review time significantly.
-- ✓ **NEW:** Action-first behavior reduces low-consequence confirmation dialogs while retaining approval gates for consequential actions.
-
-**Doesn't work yet:**
-- ~~The agent has no access to the vault's existing knowledge.~~ ✓ Basic vault search implemented.
-- ~~Memory is manual and overwrites on each save.~~ ✓ Memory consolidation via LLM now merges patterns.
-- The autonomy loop is workspace-aware but still reactive. It monitors and alerts but doesn't auto-restart workers.
-- No external tools yet (web browsing, calendar, email APIs).
-- No multi-user access control — local only.
-
-## What Comes Next
-
-The roadmap has evolved based on what was actually needed:
-
-1. ~~**Vault search**~~ ✓ Implemented — basic glob + text matching, future: ripgrep with ranking.
-2. ~~**Persistent conversation history**~~ ✓ Implemented — JSONL storage survives restarts.
-3. **Skills as modules** — modular capabilities (web browsing, shell exec) as pluggable functions.
-4. **Sandboxed execution** — Docker containers for task execution.
-5. **Gateway abstraction** — Telegram, Discord integration.
-6. **Streaming responses** — SSE for progressive display.
-7. **Automated scheduling** — cron-like execution without manual triggers.
-8. **Full autonomy** — self-initiated actions based on workspace state (restart stopped workers, process urgent items).
-
-## The Bigger Picture
-
-Aletheia represents a philosophical shift in how we think about AI agents within this system. The production pipeline (collectors, team leads, workers) optimizes for throughput and accuracy. Aletheia optimizes for something different: the quality of thinking.
-
-The question is no longer "can the AI process this faster than a human?" but "can the AI help the human think about this differently?" That requires a different architecture, a different prompt strategy, and a different evaluation metric. You don't measure a thinking partner by tokens per second.
-
-Whether this approach scales beyond a single-user local setup is an open question. But as a proof of concept for what a personal AI agent can be — beyond task execution, toward genuine creative partnership — the early results are promising.
-
-*Next: [Back to Documentation Overview](../README.md)*
+*Next: [10 — Novaterra Story Engine](10_novaterra_story_engine.md) · [Current State](../CURRENT_STATE.md)*

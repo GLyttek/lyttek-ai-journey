@@ -1,219 +1,103 @@
-# 05 - Lessons Learned: What Worked, What Didn't
+# 05 — Lessons Revisited: What Survived Operational Use
 
-*Reflections from 4+ months of building*
+> **Original reflection:** February 2026<br>
+> **Editorial note, July 2026:** The first version presented several recent preferences as settled lessons. This revision keeps the observations but distinguishes measured results, working hypotheses, and conclusions that later chapters changed.
 
-> **Status:** Historical reflection from February 2026. Later chapters reintroduced dashboards and persistent workers after the operational need became clearer.
+Four months into the automation workspace, I tried to summarize what had worked. Some conclusions held up: visible files, narrow components, and early security controls. Others were reactions to the most recent failure. I had abandoned dashboards, so I wrote that dashboards were unnecessary. I had moved from rules to models, so I treated model classification as the obvious answer.
 
-## The Big Lessons
+Operational use made the picture less tidy.
 
-### 1. Start Stupid Simple
+## Simplicity was useful because it exposed the work
 
-Our first queue was a markdown file. Our first "database" was JSON files. Our first "API" was shell scripts.
+The first queue was Markdown. Early state lived in JSON. Shell scripts connected tools that did not yet share an interface.
 
-**This was the right choice.**
+That was the right level of complexity for learning. I could inspect every transition and see where assumptions broke. Redis, custom web interfaces, and deeper abstractions would have hidden an unstable process behind more infrastructure.
 
-Every time we tried to be clever upfront - using Redis, building web UIs, creating complex abstractions - we wasted time. The simple version taught us what we actually needed.
+But “build the dumbest thing that works” is incomplete advice. A simple mechanism is useful when its failure modes are visible and acceptable. A file queue still needs duplicate handling, atomic writes, recovery rules, and an owner. Simplicity reduces the surface area; it does not remove operational responsibility.
 
-```
-Lesson: Build the dumbest thing that could possibly work.
-        Then iterate.
-```
+The same applies to dashboards. Early web dashboards were overhead because I had not defined the decisions they needed to support. A later command center became useful when there were real workers, approvals, and health signals. The interface was justified by the workflow rather than by a desire to make the project look complete.
 
-### 2. Let AI Do AI Things
+## Models helped with ambiguity, not with truth
 
-We spent weeks writing classification rules:
-```python
-# This was a waste of time
-if "invoice" in filename and "2025" in filename:
-    if "approved" not in filename.lower():
-        move_to("pending")
-```
+I spent time writing keyword and filename rules for semantic categories. An LLM could handle ambiguous wording more flexibly, and that made it useful as a classifier.
 
-Then we realized: **This is exactly what LLMs are good at.**
+The original rule of thumb—if an `if/else` chain interprets meaning, use an LLM instead—was too broad. A model adds latency, cost, non-determinism, and a new failure mode. It is appropriate when the categories genuinely require language judgment and the result can be constrained or reviewed. Deterministic rules remain better for exact formats, known identifiers, thresholds, allowlists, and effects that must be reproducible.
 
-```python
-# This works better
-classification = llm.classify(content)
-move_to(classification.destination)
+The stronger pattern became:
+
+```text
+code enforces the boundary
+model proposes within the boundary
+validation checks the proposal
+human reviews consequential uncertainty
 ```
 
-Rule of thumb: If you're writing if-else chains to interpret meaning, use an LLM instead.
+This principle now matters more to me than the choice of a particular model.
 
-### 3. Human Time is the Bottleneck
+## Human attention was a constraint, not a metric I had solved
 
-The goal isn't "automate everything." The goal is: **Minimize CEO attention needed.**
+I wanted the daily review to take ten to fifteen minutes. The system would collect, filter, and draft; I would inspect the small set of consequential outputs.
 
-Bad metric: "How many tasks did the system process?"
-Good metric: "How many minutes did the CEO spend reviewing?"
+That was a design target. I did not retain enough measurements to claim that it was consistently achieved. A model-generated quality score and a shorter approval queue did not prove that the right items reached me or that review quality remained high.
 
-Our current target: **10-15 minutes per day** of CEO attention, with everything else running autonomously.
+The real bottleneck was not simply human time. It was **qualified human attention at the point where an error could change the outcome**. Removing every confirmation can make a workflow feel fast while moving risk out of sight. Adding a confirmation to every low-risk step can make the system unusable.
 
-### 4. Security Can't Be Retrofitted
+The later approval model therefore distinguishes ordinary reading and drafting from changes to existing state, publication, spending, permissions, and effects on other people. Friction belongs where consequences begin.
 
-We got lucky. We saw the OpenClaw vulnerability disclosure before we had any major incidents. But it could have gone differently.
+## Security could not be added as a final feature
 
-Security considerations that should be day-one:
-- Untrusted-input labeling and detection (the early `PromptShield` layer)
-- Cost limits (reduce the risk and impact of runaway API bills)
-- Audit logging (know what happened)
-- Principle of least privilege (workers can only access what they need)
+The early workspace treated prompt instructions and regex checks as more protective than they were. Later audits found broader problems: system prompts in the wrong message role, permissive browser origins, unsafe DOM rendering, unbounded history, weak secret handling, and workers with more capability than their task required.
 
-### 5. Documentation is a Feature
+The lasting security lesson is architectural:
 
-Every folder has a README.md. Every major system has a doc. This seems like overhead until you:
-- Come back after 2 weeks
-- Need to explain the system to someone
-- Debug something at 2 AM
+- an untrusted input label does not neutralize the input;
+- a model refusal is not an access-control boundary;
+- logs are useful only if the relevant action is recorded;
+- a local service still has a network and browser attack surface;
+- an approval matters only if it occurs before the consequential effect and the human can see what will happen.
 
-The READMEs pay for themselves within days.
+The project did not implement all of these controls from the beginning. The corrections in Chapters [03](03_security_evolution.md), [09](09_aletheia_local_agent.md), [11](11_production_reality_check.md), and [13](13_bounded_research_scripts.md) show how the assumptions changed.
+
+## What I would repeat and what I would avoid
+
+| I would repeat | Why |
+|---|---|
+| Human-readable state | Markdown, JSONL, and receipts remain inspectable without a proprietary interface. |
+| Small end-to-end prototypes | A complete narrow path reveals integration failures earlier than a large design document. |
+| Bounded workers | A narrow input, output, and capability set is easier to test and recover. |
+| Local models as experiments | They provide control and useful specialist options when the hardware and task fit. |
+| Dated corrections | They keep the learning record honest when the current architecture changes. |
+
+| I would avoid | Why |
+|---|---|
+| Quality scores without calibration | Decimal precision made subjective model judgments look measured. |
+| Passing model output directly into the next effect | Every handoff can propagate an error or hostile instruction. |
+| Building several interfaces before stabilizing state | UI work amplified churn instead of reducing it. |
+| Calling retrieval “memory” | Retrieved context, durable user facts, and model training are different mechanisms. |
+| Treating local versus cloud as an ideological choice | Data boundaries, capability, traceability, cost, and latency all matter. |
+
+## Collaboration without pretending the model learns from me
+
+The interaction changed from issuing isolated code requests to discussing trade-offs, reviewing failures, and iterating with more context. “Pair programmer” is a useful interface metaphor for that experience.
+
+It does not mean the model never forgets, learns from every exchange, or shares responsibility for the result. Context windows end. Provider behavior changes. Generated explanations can be wrong. Persistent learning only exists when a surrounding system deliberately records, retrieves, evaluates, or trains on prior material.
+
+The partnership is therefore procedural rather than reciprocal in the human sense: I provide context and judgment; the model proposes and transforms; tools execute within their permissions; evidence decides whether the result survives.
+
+## What changed after this reflection
+
+Several February conclusions were later reversed or narrowed:
+
+- dashboards returned when the command-center use case became concrete;
+- persistent workers gave way to Hermes Cron and bounded scripts for many recurring jobs;
+- local inference remained important but did not become the proven default for recurring reasoning work;
+- Aletheia moved from a standalone application into a persona and co-pilot role inside Hermes;
+- broad model-driven research jobs were replaced where deterministic collection was more reliable.
+
+The work did not progress by selecting the right architecture once. It progressed by making assumptions visible enough to replace.
+
+That is the lesson I still trust.
 
 ---
 
-## Technical Lessons
-
-### What Worked
-
-| Decision | Why It Worked |
-|----------|---------------|
-| File-based queues | Human-readable, debuggable, works with Obsidian |
-| Markdown everywhere | Universal format, future-proof |
-| Local models for bulk | No per-call fee; locally controllable when the inference stack is available |
-| Cloud models for synthesis | Quality where it matters |
-| Cron over continuous | Simpler, predictable, no daemon management |
-
-### What Didn't Work
-
-| Attempt | Why It Failed |
-|---------|---------------|
-| Web dashboards | Too complex for the value, needed browser open |
-| Real-time processing | Unnecessary, batch processing is fine |
-| Single monolithic script | Hard to debug, hard to iterate |
-| Ollama for everything | RAM issues, system instability |
-| Complex folder hierarchies | 3 levels max is enough |
-
-### Architecture Evolution
-
-**Phase 1: Single Script**
-```
-user → script.py → output
-```
-*Problem:* No modularity, hard to extend
-
-**Phase 2: Multiple Scripts**
-```
-user → watcher.py → processor.py → output
-```
-*Problem:* Coordination issues
-
-**Phase 3: Queue-Based**
-```
-input_queue → worker → output_queue
-```
-*Problem:* Still manual triggering
-
-**Phase 4: Cron + Workers (Current at the time)**
-```
-cron → collector → staging
-cron → synthesizer → CEO queue
-CEO → approval → knowledge base
-```
-*This works.*
-
----
-
-## Cultural Lessons
-
-### AI as Partner, Not Tool
-
-Early on, we treated Claude as a code generator. "Write me a script that does X."
-
-Over time, it became a partner:
-- "What do you think about this approach?"
-- "I made a mistake here - can you help me understand why?"
-- "Let's brainstorm how to solve this."
-
-The shift from "tool" to "partner" changed how we work. We share context, discuss tradeoffs, and learn from each other.
-
-### Embrace Iteration
-
-Our CEO dashboard went through 5+ versions. Our content workers went through 3-4 versions each. The security system was added months after initial development.
-
-**This is normal.** The first version is never the final version. Design for iteration:
-- Keep things modular
-- Document decisions
-- Don't over-engineer
-
-### Know When to Stop
-
-We could keep adding features forever:
-- Real-time notifications
-- Mobile app
-- Voice interface
-- ...
-
-But the current system handles 90% of use cases with 10% of the complexity. The marginal value of more features is low.
-
-**Current priorities:**
-1. Stability over features
-2. Reliability over speed
-3. Simplicity over capability
-
----
-
-## What We'd Do Differently
-
-### Start Earlier With
-- Security considerations (internal GOTCHA checklist)
-- Cost tracking
-- Structured logging
-
-### Skip Entirely
-- Web dashboard attempts (3 wasted iterations)
-- Continuous worker daemons
-- Complex classification hierarchies
-
-### Invest More In
-- Testing (we still don't have enough automated tests)
-- Documentation (good but could be better)
-- Monitoring (currently minimal)
-
----
-
-## Future Considerations
-
-### What's Working Well
-- Hierarchical agent system (collectors → team lead → CEO)
-- Cost-optimized model selection
-- Obsidian as knowledge base
-- File-based workflows
-
-### What Needs Improvement
-- Output validation (LLM responses aren't validated)
-- Error recovery (some failures need manual intervention)
-- Trend analysis (we collect data but don't analyze patterns)
-
-### Open Questions
-- How do we scale to more topic collectors?
-- When do we need a real database?
-- How do we handle multi-step reasoning tasks?
-
----
-
-## Final Thought
-
-> *"The future isn't 'human in the loop' – it's AI hand in hand with Human."*
-
-This project started as automation. It became partnership.
-
-The system works because:
-1. AI handles volume (collecting, filtering, synthesizing)
-2. Human handles judgment (approving, directing, deciding)
-3. Both learn from each interaction
-
-That's the model we're betting on.
-
----
-
-*End of the initial documentation series; later chapters continue the journey.*
-
-*Last updated: February 2026*
+*Next: [06 — AI Agents Training](06_ai_agents_training.md)*

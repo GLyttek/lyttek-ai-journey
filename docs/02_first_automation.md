@@ -1,216 +1,124 @@
-# 02 - First Automation: Building the Foundation
+# 02 — First Automation: From Scripts to a Workspace
 
-> **Status:** Historical snapshot. Sections labeled “current” describe the system at the time; Chapters 9 and 11 supersede parts of this design.
+> **Historical period:** November–December 2025<br>
+> **Editorial note, July 2026:** This chapter describes the first automation workspace. The original version overstated the reliability of LLM classification, quality scores, and background operation. The architecture is preserved here as a dated experiment; [Current State](../CURRENT_STATE.md) describes the system used now.
 
-*November-December 2025*
+By late 2025, the problem was no longer how to call a model. I had many scripts that worked when I ran them manually. The harder question was whether they could form a workflow I could understand after a week away.
 
-## The Starting Point
+I wanted URLs, research requests, and draft material to move through a visible sequence without disappearing into a service or database I could not inspect. That led to a file-based workspace built around Markdown, Python, cron, and Obsidian.
 
-After the first successful conversations with Claude Code, we had a working content pipeline. But it was manual - we had to run scripts by hand, check outputs, move files around.
+## Organizing the state
 
-The question became: **How do we make this run itself?**
+The first useful decision was mundane: give every category a place and put a README in each major folder.
 
-## The Workspace Structure
+The workspace used numbered areas for decisions, operations, media, research, scripts, and knowledge. I used labels such as CEO and COO as role metaphors for approval and coordination. They were not evidence of a staffed organization or autonomous executive agents.
 
-Our first major decision was organizing the chaos. We created a numbered folder system:
+Markdown and JSON were convenient because I could open them directly, search them, version them, and repair them without a special administration tool. The trade-off was equally real: files provide no transaction boundary, concurrent writers can collide, and moving a file is not the same as recording a reliable state transition.
 
-```
-COO Agent Workspace/
-├── 00_CEO/                 # Decision point - human approval
-│   ├── Pending_Approval/   # Items waiting for CEO
-│   ├── Research_Queue/     # Research requests
-│   └── Completed/          # Archive
-├── 01_Lyttek_Operations/   # Business operations
-├── 02_Personal_Brand_Media/# Content & marketing
-├── 03_Family_Office/       # Investments
-├── 04_AI_Tools/            # Automation scripts
-└── 05_Knowledge_Lab/       # Research outputs
-```
+At this scale, visibility mattered more than database features. That choice held up better than many of the abstractions built around it.
 
-Each folder got its own `README.md` - a pattern that proved invaluable. When you come back after a week, the README tells you what belongs here and what doesn't.
+## The first routing attempts
 
-## The COO Secretary: First Attempt
+The “COO Secretary” began as a script that scanned unsorted files, proposed a category, moved the item, and updated a dashboard.
 
-Our first automation was the "COO Secretary" - a Python script that:
+The classifier changed several times:
 
-1. Scanned the workspace for unsorted files
-2. Classified them by content
-3. Routed them to the right folder
-4. Updated a CEO dashboard
+1. filename rules;
+2. keyword lists;
+3. LLM-assisted classification.
 
-### What We Learned (The Hard Way)
+The original lesson was “let the AI figure it out.” That was too broad. LLM classification was more flexible for ambiguous text, but it also introduced non-determinism and confident misclassification. A safer design treats the model result as a proposal constrained by an allowed destination schema. Unknown or high-impact cases need validation or human review.
 
-**Iteration 1:** Rule-based classification
-```python
-# Too rigid, missed edge cases
-if "invoice" in filename.lower():
-    move_to("01_Operations/Finance")
+The useful division became:
+
+```text
+Deterministic code: enumerate files, enforce allowed paths, move approved items, log results
+Model: propose a label when meaning is ambiguous
+Human: resolve consequential or uncertain cases
 ```
 
-**Iteration 2:** Keyword matching
-```python
-# Better, but still brittle
-keywords = {
-    "research": "05_Knowledge_Lab",
-    "approval": "00_CEO/Pending_Approval",
-    ...
-}
+That separation was not complete in the first version. It became clearer after later audits.
+
+## Five dashboard iterations
+
+The dashboard was the most frequently rebuilt part of the workspace. At least five named versions remained in the local archive:
+
+- a manually maintained Markdown list;
+- categorized Markdown sections;
+- an auto-generated Markdown dashboard;
+- several Flask-based web interfaces;
+- a return to Markdown plus scheduled updates.
+
+The web dashboards were not inherently a mistake. I built them before the underlying state and operational need were stable. They added a process to run, a browser surface to secure, and another interface to maintain while the queues themselves were still changing.
+
+Obsidian covered most of the immediate navigation need. Later, a command center became useful when there were real workers, health signals, and approvals to control. The lesson was not “never build a dashboard.” It was: earn the interface by first understanding the decisions it must support.
+
+## The worker pattern
+
+A simple pattern appeared across the scripts:
+
+```text
+bounded input → worker → inspectable output → log
 ```
 
-**Iteration 3:** LLM-assisted classification
-```python
-# Finally flexible enough
-response = llm.classify(content)
-destination = response["folder"]
-```
+Examples included URL processing, YouTube transcription, webpage analysis, research requests, and draft generation. Each worker watched a specific input, handled items individually, and wrote to a known destination.
 
-The jump from rule-based to LLM-assisted was a mindset shift. We stopped trying to anticipate every case and let the AI figure it out.
+This reduced the cost of debugging compared with a single monolithic program. It also created a new operational burden: jobs could stop, process the same item twice, leave half-written output, or fail without anyone noticing. Logging existed, but recovery and idempotency were uneven.
 
-## The CEO Dashboard Saga
+The later architecture added controllers and health checks. In July 2026, much of this custom runtime has been replaced by Hermes Cron, scoped skills, and deterministic scripts where model reasoning is unnecessary.
 
-Perhaps our most iterated component. We went through **at least 5 major versions**:
+## The quality-score experiment
 
-### v1: Simple Markdown List
-```markdown
-# CEO Action Items
-- [ ] Review document X
-- [ ] Approve research Y
-```
-*Problem:* No structure, hard to prioritize
-
-### v2: Categorized Sections
-```markdown
-## Pending Approvals
-## Research Queue
-## Statistics
-```
-*Problem:* Still manual updates
-
-### v3: Auto-generated Dashboard
-```python
-def generate_dashboard():
-    pending = scan_folder("Pending_Approval")
-    research = scan_folder("Research_Queue")
-    write_markdown(format_dashboard(pending, research))
-```
-*Problem:* No history, regenerates from scratch
-
-### v4: Web Dashboard Attempts
-We tried Flask-based dashboards multiple times:
-- `ceo_dashboard.py` - Basic HTML
-- `ceo_dashboard_unified.py` - Unified view
-- `ceo_dashboard_v2.py` - WebSocket updates
-
-*Problem:* Too complex, needed to keep browser open
-
-### v5: Markdown + Cron (Current)
-Back to basics:
-- Markdown files (work in Obsidian)
-- Cron jobs for updates
-- Claude Code as primary interface
-
-*Lesson:* Sometimes simpler is better. We don't need a fancy web UI when Obsidian + Claude Code covers 90% of use cases.
-
-## The Worker Pattern
-
-As we built more automations, a pattern emerged:
-
-```
-Input Source → Worker → Output Destination
-```
-
-Each worker:
-1. Watches a specific input (folder, queue, RSS feed)
-2. Processes items one by one
-3. Outputs to a specific destination
-4. Logs everything
-
-### Our Workers (Evolution)
-
-| Worker | Purpose | Iterations |
-|--------|---------|------------|
-| `content_queue_watcher` | URL processing | 3 versions |
-| `yt-analyzer` | YouTube analysis | 4 versions |
-| `webpage_processor` | Webpage analysis | 2 versions |
-| `research_worker` | Research queries | 3 versions |
-| `writer_queue_watcher` | Content generation | 2 versions |
-
-## The Quality Gate
-
-A critical addition was the **quality threshold system**:
+One router assigned generated content a score and used thresholds such as `8.6` to decide whether a document should reach the approval queue.
 
 ```python
-if quality_score >= 8.6:
-    route_to("CEO/Pending_Approval")  # High quality → CEO sees it
-elif quality_score >= 7.0:
-    route_to("Quality_Review")         # Medium → needs review
+if score >= 8.6:
+    destination = "pending_approval"
+elif score >= 7.0:
+    destination = "quality_review"
 else:
-    route_to("Archive")                # Low → auto-archive
+    destination = "archive"
 ```
 
-This meant the CEO only sees content that meets a quality bar. The system filters noise automatically.
+This was a routing heuristic, not a validated quality measurement. The score came from a model assessment rather than a calibrated evaluator with known precision and recall. A document scoring `8.7` was not demonstrated to be better than one scoring `8.5`.
 
-## Key Technical Decisions
+The experiment still exposed a useful requirement: human attention is limited, so the system needs triage. The stronger implementation is to combine explicit checks—required sections, source presence, schema validity, policy rules, and task-specific tests—with model review where qualitative judgment is unavoidable. The model score can inform review priority, but it should not manufacture certainty.
 
-### 1. File-Based Queues
-We chose markdown files over databases:
-- **Pros:** Human-readable, version-controlled, works with Obsidian
-- **Cons:** No transactions, potential race conditions
+## What worked and what failed
 
-For our scale (hundreds of items, not millions), file-based won.
+What held up:
 
-### 2. LLM Router
-Instead of hardcoding which model to use:
-```python
-router = LLMRouter()
-result = router.call_openrouter(
-    model_id="mistralai/mistral-small-creative",
-    prompt=content,
-    caller="yt-analyzer"  # For cost tracking
-)
-```
+- human-readable files as the shared state;
+- small workers with narrow inputs and outputs;
+- README files close to the folders they explained;
+- a visible approval queue before publication or other consequential action;
+- scheduled batch work for tasks that did not need real-time processing.
 
-The router handles:
-- Model selection
-- Cost tracking
-- Budget limits
-- Fallbacks
+What failed or remained incomplete:
 
-### 3. Knowledge Curator
-Auto-classification of outputs:
-```python
-curator = KnowledgeCurator()
-destination = curator.classify_and_save(content)
-# Returns: "05_Knowledge_Lab/AI_Technology/Security/..."
-```
+- automatic classification without a strict destination boundary;
+- multiple dashboards built before the workflow stabilized;
+- workers with too many responsibilities;
+- background jobs without consistent health and recovery checks;
+- quality numbers that looked more objective than they were;
+- the assumption that automation meant the rest of the system could be ignored.
 
-This creates a self-organizing knowledge base.
+I described a ten-minute morning review as the target: open Obsidian, inspect a few pending documents, approve or reject them, and leave the remaining work to scheduled processes. I did not retain a measurement series showing that this target was consistently achieved.
 
-## What Didn't Work
+## What this stage changed
 
-1. **Too Many Dashboards:** We built 3 different dashboards before realizing we didn't need any of them.
+The first automation workspace taught me that the difficult part was not generating content. It was maintaining state across time:
 
-2. **Over-Engineering Workers:** Early workers had too many features. Simplifying them made them more reliable.
+- What has already run?
+- Which source produced this output?
+- What failed halfway through?
+- Who approved the next effect?
+- Can I understand the system after it has been unattended?
 
-3. **Ignoring Obsidian:** We tried to build our own UI when Obsidian was already perfect for markdown navigation.
+Those questions led to security controls, audit work, and eventually a stricter distinction between collection, model reasoning, human judgment, and execution.
 
-4. **Manual Triggers:** Having to manually run scripts defeated the purpose. Cron jobs fixed this.
-
-## The Turning Point
-
-The system became truly useful when we could do this:
-
-```
-Morning routine:
-1. Open Obsidian
-2. Check 00_CEO/Pending_Approval/
-3. Review 2-3 documents
-4. Mark as approved/rejected
-5. Done (10 minutes)
-```
-
-Everything else happens automatically in the background.
+The workspace was useful, but it was not self-running in the strong sense. It required maintenance, review, and repeated correction. That became the next chapter.
 
 ---
 
-*Next: [03 - Security Evolution](03_security_evolution.md)*
+*Next: [03 — Security Evolution](03_security_evolution.md)*
