@@ -47,6 +47,20 @@ These are learning artifacts. They contain rough edges and should not be read as
 - **Aletheia and human control:** [Aletheia](docs/09_aletheia_local_agent.md) → [Current State](CURRENT_STATE.md)
 - **Local models and reliability:** [Early LLM Patterns](docs/08_early_llm_patterns.md) → [Bonsai 1-bit Deployment](docs/12_bonsai_1bit_local_deployment.md) → [When Agentic Research Needed Less Agency](docs/13_bounded_research_scripts.md)
 
+## Practical agent-security guides
+
+These guides turn the repository's later lessons into reviewable control patterns. They are design and review material, not an audited framework or a substitute for testing the real environment.
+
+- [Secure Agent Control Plane](guides/secure_agent_control_plane.md) — separate model proposals from authorization, execution, egress and verification.
+- [MCP Least Privilege and Tool Scoping](guides/mcp_least_privilege.md) — inventory servers, minimize tool exposure, protect credentials and control cross-server data flow.
+- [Defensive Rules for Coding Agents](guides/defensive_coding_agent_rules.md) — repository instructions plus the deterministic controls that must enforce them.
+- [API Security by Design](guides/api_security_by_design.md) — make actors, resources, relationships, states and negative authorization cases explicit before generation.
+- [Verifiable Control Points](guides/verifiable_control_points.md) — define where a control runs, what it blocks and which evidence proves its operation.
+
+### Field note in German
+
+- [Risk Tiering in der Praxis: Was funktioniert hat und was nicht](field-notes/risk_tiering_in_practice_de.md) — local successes, classification failures, approval fatigue and the boundary between recommendation and enforcement.
+
 ## Current state
 
 **Snapshot:** 16 July 2026<br>
