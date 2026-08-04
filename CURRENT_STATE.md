@@ -41,6 +41,16 @@ I want to make it very clear that no model is free of ideological or institution
 | **Security and threat-intelligence work** | Learning, source screening, awareness, and local triage | Active as bounded research workflows; not a production SOC or autonomous response system |
 | **Publishing workflow** | Drafting, local review, backup, controlled upload, and post-upload verification for lyttek.org | Used in practice; manually controlled and backed up, not a CI/CD pipeline |
 
+## Pantheon architecture addendum — August 4, 2026
+
+The [Pantheon architecture note](docs/14_pantheon_bounded_cognition.md) revisits the earlier ACE experiment against pinned public snapshots of ACE, OpenAI Agent Swarm/HAAS, and Sparse Priming Representations.
+
+Pantheon currently has bounded technical evidence for six specialist paths and a local evidence layer. It does **not** run as one autonomous production chain. Routing remains advisory, consequential action remains separately approved, and general human utility remains unproven.
+
+The strongest result is a preserved rejection: a candidate frame-audit extension was frozen, tested once against a sealed public synthetic holdout, and not integrated after failing its semantic acceptance criteria. This demonstrates a rejection process, not production readiness or downstream benefit.
+
+The next measurable tests are a versioned strategy brief, a live capability snapshot, a privilege-lineage receipt, a recovery exercise, and a source-bound sparse-priming comparison.
+
 ## What changed from the earlier chapters
 
 The [historical Aletheia chapter](docs/09_aletheia_local_agent.md) describes a standalone local application and command center. That runtime is no longer active. It was archived after its useful security and architecture patterns had been extracted. Aletheia continued as a persona and working role inside Hermes.
