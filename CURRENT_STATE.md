@@ -47,7 +47,7 @@ The [Pantheon architecture note](docs/14_pantheon_bounded_cognition.md) revisits
 
 Pantheon currently has bounded technical evidence for six specialist paths and a local evidence layer. It does **not** run as one autonomous production chain. Routing remains advisory, consequential action remains separately approved, and general human utility remains unproven.
 
-The strongest result is a preserved rejection: a candidate frame-audit extension was frozen, tested once against a sealed public synthetic holdout, and not integrated after failing its semantic acceptance criteria. This demonstrates a rejection process, not production readiness or downstream benefit.
+A candidate frame-audit extension was frozen, tested once against a sealed public synthetic holdout, and not integrated after failing its semantic acceptance criteria. The retained result documents a rejection process; it does not establish production readiness or downstream benefit.
 
 The next measurable tests are a versioned strategy brief, a live capability snapshot, a privilege-lineage receipt, a recovery exercise, and a source-bound sparse-priming comparison.
 

@@ -4,11 +4,11 @@
 
 **Date:** August 4, 2026
 
-I returned to David Shapiro's ACE diagram while reviewing Pantheon. The image was familiar because ACE was one of the intellectual parents of this work. It gave me a way to separate values, strategy, self-knowledge, planning, task selection and execution before I had reliable software for any of them.
+I returned to David Shapiro's ACE diagram while reviewing Pantheon. Shapiro's public work was an important early influence on how I thought about autonomous systems. ACE gave me a useful vocabulary for separating values, strategy, self-knowledge, planning, task selection and execution before I had reliable software for any of them.
 
-My earlier [ACE experiment](07_ace_framework_exploration.md) copied that separation into Python classes and a message bus. Much of the reasoning was simulated. The prototype taught me that moving text between named layers did not enforce the authority shown in the diagram.
+In my earlier [ACE experiment](07_ace_framework_exploration.md), I translated that separation into Python classes and a message bus. Much of the reasoning was simulated, and the prototype showed that moving text between named layers did not enforce the authority shown in the diagram.
 
-Pantheon grew from that correction.
+That lesson later shaped Pantheon.
 
 ## The sources I compared
 
@@ -22,7 +22,7 @@ All three repositories are MIT-licensed and archived. I treated them as historic
 
 The ACE image supplied for this review is pixel-identical to the [architecture image in the pinned repository](https://github.com/daveshap/ACE_Framework/blob/c6693ee2ff547d63675f938a3714165050fd0126/images/ACE%20Framework%20Overall%20Architecture.png). It shows six cognitive layers, a southbound control bus, a northbound telemetry bus and an input/output boundary to the environment.
 
-## What ACE gave me
+## Questions I still use from ACE
 
 ACE describes a continuous path:
 
@@ -44,7 +44,7 @@ environment
 
 The southbound bus carries mission and instructions. The northbound bus returns state, telemetry, progress and failure. A separate System Integrity overlay is intended to watch components, configuration and models outside the main cognition path.
 
-That model still helps me ask good questions:
+I still use the model to ask:
 
 - Did the task inherit a real objective or invent one?
 - Does the plan fit the system's actual capabilities?
@@ -56,7 +56,7 @@ ACE's roadmap also aimed at self-direction, self-modification and increasingly a
 
 The strongest public implementation is the [`ACE_PRIME/HelloAF` demonstrator](https://github.com/daveshap/ACE_Framework/tree/c6693ee2ff547d63675f938a3714165050fd0126/ACE_PRIME/HelloAF). It starts components in containers, connects neighbouring layers through RabbitMQ/AMQP, checks communication and exposes logging, debugging and telemetry paths. That is real implementation work. The loop is still incomplete: [`layer_6.py`](https://github.com/daveshap/ACE_Framework/blob/c6693ee2ff547d63675f938a3714165050fd0126/ACE_PRIME/HelloAF/src/ace/resources/core/hello_layers/layer_6.py) has command execution commented out, while [`system_integrity.py`](https://github.com/daveshap/ACE_Framework/blob/c6693ee2ff547d63675f938a3714165050fd0126/ACE_PRIME/HelloAF/src/ace/framework/resources/system_integrity.py) implements a much narrower supervisor than the security controls described in the framework document.
 
-## Pantheon's different boundary
+## Where Pantheon took a different path
 
 Pantheon is a set of named specialist roles, contracts, local evidence stores and host-side validation paths. Its current design keeps consequential authority outside the model hierarchy.
 
@@ -84,7 +84,7 @@ flowchart TB
     A -. scoped execution .-> X
 ```
 
-This is a responsibility map. It is not a claim that the whole diagram runs as one autonomous pipeline.
+The diagram maps responsibility; the whole flow does not run as one autonomous pipeline.
 
 Six specialist paths have bounded technical evidence:
 
@@ -113,15 +113,15 @@ Current status: these are manual pilots and isolated paths. Pantheon has no prod
 | Southbound Bus | approved contracts, schemas and scoped parameters | Free text does not grant authority. |
 | System Integrity | runtime gates, frozen evaluators, tests and receipts | Stronger evidence exists for selected paths, but no complete live integrity monitor exists. |
 
-## Where Pantheon has earned a stronger claim
+## Controls Pantheon has actually tested
 
 ### Authority is separated from model output
 
 ACE places a language-model layer at the top of its hierarchy. HAAS places a Supreme Oversight Board of agents above its swarm. Pantheon keeps approval with me. A model can propose, classify or challenge. It cannot turn its own prose into permission.
 
-That does not guarantee control. It gives the system a clearer constitutional boundary.
+This separation does not guarantee control, but it makes the authority boundary explicit.
 
-### Evidence classes do not collapse into one score
+### Technical tests and human utility remain separate
 
 Pantheon separates four questions:
 
@@ -136,7 +136,7 @@ Only explicit feedback or observed use can support the fourth claim. A passing s
 
 A separate Melete frame-audit candidate was frozen and tested once against a sealed public synthetic holdout. It respected the question budget and authority boundary, but failed the semantic acceptance criteria. One question introduced an unsupported success criterion. I rejected the candidate instead of integrating it.
 
-The result matters because the architecture stopped its own preferred idea. The experiment is evidence of a working rejection process, not evidence that the frame audit was useful.
+I kept the failed result and did not integrate the extension. That records a functioning rejection process; it says nothing about the frame audit's practical value.
 
 ### Memory and external processing have explicit limits
 
@@ -144,7 +144,7 @@ Selected Pantheon paths carry data classes and provider policies. The tested ext
 
 This is narrower than a general security claim. It is still more concrete than asking a model to remember an ethical instruction.
 
-## Where ACE and HAAS remain ahead
+## Where Pantheon still falls short
 
 ACE is the more coherent whole-system design. It connects purpose, world state, self-model, resource planning, task switching and action in one architecture, although its public demonstrator does not complete that path. Pantheon has better evidence boundaries for individual parts but also lacks a continuous operating loop.
 
@@ -156,19 +156,19 @@ Three gaps are especially clear:
 
 HAAS also states a useful privilege rule: a child agent must not inherit more authority than its parent. The archived prototype does not enforce that rule as RBAC; communication lists are not authorization. I want the rule without the self-expanding swarm. A future delegation receipt should record parent, child, removed permissions, allowed tools, data, destinations and expiry.
 
-## What I take from Sparse Priming
+## Testing sparse priming without trusting it
 
 Sparse Priming Representations try to reconstruct a large concept from a short set of carefully chosen statements and associations. That can reduce context and make role hand-offs cheaper.
 
-It can also hide loss. The decompressor prompt encourages inference, so a plausible reconstruction may add details that were never in the source.
+The same compression can hide loss because the decompressor prompt encourages inference. A plausible reconstruction may add details that were never in the source.
 
 I would only use SPR-like material as a source-bound priming capsule. The capsule would carry source references, hashes, scope, known omissions and an explicit `no_authority` marker. A worker could use it to activate context, but would have to retrieve the source before treating a claim as evidence or acting on it.
 
 That idea still needs a benchmark. Relevant raw chunks, extractive notes, a normal abstractive summary, an SPR capsule and an SPR capsule with retrieved source chunks should face the same tasks and model. Factual, constraint and source faithfulness must be measured on an unseen set alongside context use.
 
-## What I want to measure next
+## Next tests
 
-Pantheon should compete on observable boundaries rather than the number of named agents.
+I want to judge Pantheon by observable boundaries, not by the number of named agents.
 
 | Measure | Question |
 |---|---|
@@ -184,13 +184,13 @@ Pantheon should compete on observable boundaries rather than the number of named
 
 The next useful experiments are small: a versioned strategy brief, a live capability snapshot, a privilege-lineage receipt, one recovery test and a source-bound priming comparison. Each needs a baseline and a stopping rule.
 
-## What I will not inherit
+## Design choices I am keeping out
 
-I do not plan to add autonomous agent spawning, natural-language self-approval or self-modification. Telemetry will not become permission. A compressed memory will not become a source. A new role will not be added merely to make Pantheon resemble all six ACE layers.
+I do not plan to add autonomous agent spawning, natural-language self-approval or self-modification. Telemetry remains operational evidence, and compressed memory remains a retrieval aid; neither grants authority. I will add a role only when a separate contract and measurable task justify it, not to mirror ACE's six layers.
 
-Shapiro's work gave me an anatomy for autonomous cognition. Pantheon became my attempt to add a constitutional boundary around specialized cognition before granting it a body that could act.
+Shapiro was an important early voice in the public discussion around autonomous agents, and I learned from his work. It helped me frame questions about autonomy, hierarchy and feedback. Pantheon is my own attempt to answer those questions with human authority and testable boundaries.
 
-Some architectures prove themselves by what they automate. Pantheon's first meaningful proof was that it preserved enough evidence to stop.
+The frame-audit rejection is the clearest result so far: Pantheon preserved the evidence needed to stop an extension I wanted to work.
 
 ## References
 

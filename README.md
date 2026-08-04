@@ -30,7 +30,7 @@ The private production workspace, personal data, credentials, and raw source arc
 | **Oct–Dec 2025** | Turning scripts into file-based queues, workers, dashboards, and approval folders | [Genesis](docs/01_genesis.md) and [First Automation](docs/02_first_automation.md) |
 | **Jan–Feb 2026** | Adding security controls, multiple model roles, Aletheia, and a local command-center prototype | Chapters [03](docs/03_security_evolution.md) through [11](docs/11_production_reality_check.md) |
 | **Apr–Jul 2026** | Testing local deployment, replacing brittle agentic jobs with bounded scripts, and moving Aletheia into Hermes Agent | [Bonsai deployment](docs/12_bonsai_1bit_local_deployment.md), [bounded research](docs/13_bounded_research_scripts.md), and [Current State](CURRENT_STATE.md) |
-| **Aug 2026** | Revisiting ACE, HAAS, and sparse priming through the bounded Pantheon experiment: explicit authority, evidence, rejection, and measurable next tests | [Pantheon: What I Kept from ACE](docs/14_pantheon_bounded_cognition.md) |
+| **Aug 2026** | Revisiting ACE, HAAS, and sparse priming through the bounded Pantheon experiment, including its authority model and a rejected extension | [Pantheon: What I Kept from ACE](docs/14_pantheon_bounded_cognition.md) |
 
 The earliest public code evidence is the [`myscripts` repository](https://github.com/GLyttek/myscripts), created on 2 March 2024. Its 2024 history includes:
 
@@ -116,7 +116,7 @@ Older chapters did not always make these boundaries explicit. The July 2026 edit
 | [11 — Production Reality Check](docs/11_production_reality_check.md) | Feb 2026 | Infrastructure hardening and PDCA verification | Verified case-study snapshot |
 | [12 — Bonsai 1-bit Local Deployment](docs/12_bonsai_1bit_local_deployment.md) | Apr 2026 | AMD ROCm deployment and local benchmark | Single-machine case study |
 | [13 — When Agentic Research Needed Less Agency](docs/13_bounded_research_scripts.md) | Jul 2026 | Replacing brittle model-driven research crons with bounded scripts | Verified local case-study snapshot |
-| [14 — Pantheon: What I Kept from ACE](docs/14_pantheon_bounded_cognition.md) | Aug 2026 | Revisiting ACE, HAAS, and sparse priming through authority boundaries, evidence, and a preserved rejection | Current architecture note and bounded experiment report |
+| [14 — Pantheon: What I Kept from ACE](docs/14_pantheon_bounded_cognition.md) | Aug 2026 | How Pantheon differs from ACE and what a rejected extension showed | Current architecture note and bounded experiment report |
 
 ## Responsibility flow
 
