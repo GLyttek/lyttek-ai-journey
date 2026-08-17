@@ -2,7 +2,7 @@
 
 **A documented personal AI journey — from a WhatsApp conversation with Pi in May 2023 to local models, automation workers, and a bounded human-approved agent system.**
 
-I did not begin with an agent architecture. I began by talking to an AI and asking what kind of relationship between people and machines might be useful.
+I began by talking to an AI and asking what kind of relationship between people and machines might be useful. The agent architecture came later.
 
 The first retained source is a private WhatsApp conversation with Pi from May 2023. By March 2024 I was publishing small Python experiments for local models and model APIs. In 2025 those experiments grew into file-based workers and queues. In 2026 the work became less about adding autonomy and more about evidence, permissions, failure recovery, and knowing when a deterministic script is the better tool.
 
@@ -30,7 +30,7 @@ The private production workspace, personal data, credentials, and raw source arc
 | **Oct–Dec 2025** | Turning scripts into file-based queues, workers, dashboards, and approval folders | [Genesis](docs/01_genesis.md) and [First Automation](docs/02_first_automation.md) |
 | **Jan–Feb 2026** | Adding security controls, multiple model roles, Aletheia, and a local command-center prototype | [Security Evolution](docs/03_security_evolution.md), [Multi-Agent Architecture](docs/04_multi_agent.md), [Lessons Revisited](docs/05_lessons_learned.md), [AI Agents Training](docs/06_ai_agents_training.md), [Aletheia](docs/09_aletheia_local_agent.md), and [Production Reality Check](docs/11_production_reality_check.md) |
 | **Apr–Jul 2026** | Testing local deployment, replacing brittle agentic jobs with bounded scripts, and moving Aletheia into Hermes Agent | [Bonsai deployment](docs/12_bonsai_1bit_local_deployment.md), [bounded research](docs/13_bounded_research_scripts.md), and [Current State](CURRENT_STATE.md) |
-| **Aug 2026** | Revisiting ACE, HAAS, and sparse priming through a bounded-cognition experiment, while separately testing a read-only Hermes Desktop room | [Pantheon Bounded Cognition](docs/14_pantheon_bounded_cognition.md) and the status distinction in [Current State](CURRENT_STATE.md) |
+| **Aug 2026** | Revisiting ACE, HAAS, and sparse priming through a bounded-cognition experiment; separately testing a read-only Hermes Desktop room; comparing the questions from the Pi archive with the controls that exist now | [Pantheon Bounded Cognition](docs/14_pantheon_bounded_cognition.md), [Questions That Survived](docs/15_questions_that_survived.md), and the status distinctions in [Current State](CURRENT_STATE.md) |
 
 The earliest public code evidence is the [`myscripts` repository](https://github.com/GLyttek/myscripts), created on 2 March 2024. Its 2024 history includes:
 
@@ -43,6 +43,7 @@ These are learning artifacts. They contain rough edges and should not be read as
 
 ## Choose a reading path
 
+- **Then and now:** [The Ferryman Before the System](docs/prologue_pi_2023.md) → [Questions That Survived](docs/15_questions_that_survived.md) → [Current State](CURRENT_STATE.md)
 - **Origin and intent:** [The Ferryman Before the System](docs/prologue_pi_2023.md) → [Early Experiments](docs/00_prequel_experiments.md) → [Genesis](docs/01_genesis.md)
 - **Automation and failure:** [First Automation](docs/02_first_automation.md) → [Lessons Revisited](docs/05_lessons_learned.md) → [Production Reality Check](docs/11_production_reality_check.md)
 - **Aletheia and human control:** [Aletheia](docs/09_aletheia_local_agent.md) → [Current State](CURRENT_STATE.md)
@@ -117,6 +118,7 @@ Older chapters did not always make these boundaries explicit. The July 2026 edit
 | [12 — Bonsai 1-bit Local Deployment](docs/12_bonsai_1bit_local_deployment.md) | Apr 2026 | AMD ROCm deployment and local benchmark | Single-machine case study |
 | [13 — When Agentic Research Needed Less Agency](docs/13_bounded_research_scripts.md) | Jul 2026 | Replacing brittle model-driven research crons with bounded scripts | Verified local case-study snapshot |
 | [14 — Pantheon Bounded Cognition](docs/14_pantheon_bounded_cognition.md) | Aug 2026 | How the bounded-cognition experiment differs from ACE and what a rejected extension showed | Bounded experiment note; separate from Pantheon Agent Room |
+| [15 — Questions That Survived](docs/15_questions_that_survived.md) | May 2023–Aug 2026 | What the early Pi questions became after APIs, local models, Claude Code, agent experiments, and Hermes | Current reflection with private-archive boundary and public technical links |
 
 ## Responsibility flow
 
@@ -160,7 +162,7 @@ Do not deploy excerpts unchanged in a sensitive environment.
 - [AI Agents Workshop](workshops/AI_Agents_Workshop_Outline.md) — revised public outline with exercises, evidence boundaries, and facilitator guardrails
 - [Training video](https://youtu.be/64qeuW15J8g) — unedited February 2026 presentation snapshot; later corrections live in Chapter 06 and the workshop outline
 - [Redefining Efficiency in AI](whitepapers/Redefining%20Efficiency%20in%20AI%20The%20Impact%20of%201.58-bit%20LLMs%20on%20the%20Future%20of%20Computing.pdf) — canonical 2026 re-export of the 2024 paper text, with an evidence-based [2026 retrospective](whitepapers/1_58_bit_llm_retrospective_2026.md)
-- [`GLyttek/myscripts`](https://github.com/GLyttek/myscripts) — public Python experiments and utilities
+- [`GLyttek/myscripts`](https://github.com/GLyttek/myscripts) — the public starting point: early Python experiments, tools, and prototypes preserved as a historical workshop
 
 External influences referenced in historical chapters include David Shapiro's [ACE Framework](https://github.com/daveshap/ACE_Framework), [OpenAI Agent Swarm / HAAS](https://github.com/daveshap/OpenAI_Agent_Swarm), and [GATO Framework](https://github.com/daveshap/GATO_Framework). `GOTCHA` was an internal security mnemonic, not an industry standard.
 
