@@ -26,11 +26,11 @@ The private production workspace, personal data, credentials, and raw source arc
 |---|---|---|
 | **May 2023–Jan 2025** | Talking with Pi about trust, memory, bias, hallucinations, care, attachment, and AI as a ferryman rather than an authority | [Public reflection](docs/prologue_pi_2023.md), based on a private retained WhatsApp export |
 | **Feb–Apr 2024** | Comparing local-model output, calling Claude and Groq from Python, transcribing audio, and building rough RAG and document pipelines | Public commits in [`GLyttek/myscripts`](https://github.com/GLyttek/myscripts) plus private local artifacts |
-| **Aug 2024–Feb 2025** | Exploring MITRE extraction, retrieval, prompt chains, tool loops, and model routing | [Early experiments](docs/00_prequel_experiments.md) and [pattern review](docs/08_early_llm_patterns.md); cleaned examples were published later |
+| **Aug 2024–Feb 2025** | Exploring MITRE extraction, retrieval, prompt chains, tool loops, model routing, and an early story engine | [Early experiments](docs/00_prequel_experiments.md), [pattern review](docs/08_early_llm_patterns.md), and [Novaterra](docs/10_novaterra_story_engine.md) |
 | **Oct–Dec 2025** | Turning scripts into file-based queues, workers, dashboards, and approval folders | [Genesis](docs/01_genesis.md) and [First Automation](docs/02_first_automation.md) |
-| **Jan–Feb 2026** | Adding security controls, multiple model roles, Aletheia, and a local command-center prototype | Chapters [03](docs/03_security_evolution.md) through [11](docs/11_production_reality_check.md) |
+| **Jan–Feb 2026** | Adding security controls, multiple model roles, Aletheia, and a local command-center prototype | [Security Evolution](docs/03_security_evolution.md), [Multi-Agent Architecture](docs/04_multi_agent.md), [Lessons Revisited](docs/05_lessons_learned.md), [AI Agents Training](docs/06_ai_agents_training.md), [Aletheia](docs/09_aletheia_local_agent.md), and [Production Reality Check](docs/11_production_reality_check.md) |
 | **Apr–Jul 2026** | Testing local deployment, replacing brittle agentic jobs with bounded scripts, and moving Aletheia into Hermes Agent | [Bonsai deployment](docs/12_bonsai_1bit_local_deployment.md), [bounded research](docs/13_bounded_research_scripts.md), and [Current State](CURRENT_STATE.md) |
-| **Aug 2026** | Revisiting ACE, HAAS, and sparse priming through the bounded Pantheon experiment, including its authority model and a rejected extension | [Pantheon: What I Kept from ACE](docs/14_pantheon_bounded_cognition.md) |
+| **Aug 2026** | Revisiting ACE, HAAS, and sparse priming through a bounded-cognition experiment, while separately testing a read-only Hermes Desktop room | [Pantheon Bounded Cognition](docs/14_pantheon_bounded_cognition.md) and the status distinction in [Current State](CURRENT_STATE.md) |
 
 The earliest public code evidence is the [`myscripts` repository](https://github.com/GLyttek/myscripts), created on 2 March 2024. Its 2024 history includes:
 
@@ -39,14 +39,14 @@ The earliest public code evidence is the [`myscripts` repository](https://github
 - a [Groq/Mixtral chatbot](https://github.com/GLyttek/myscripts/commit/ef2bffa9de363ee6660221c37c57d8fbef98e5ab);
 - a [local Whisper and API summarization pipeline](https://github.com/GLyttek/myscripts/commit/50e128f7453da379feda240ead4cb633688394fd).
 
-These are learning artifacts. They contain rough edges and should not be read as current implementation advice. The later `llm-experiments/` collection in that repository was cleaned up and added in 2026; its current location is not evidence that the same published files existed in 2024.
+These are learning artifacts. They contain rough edges and should not be read as current implementation advice. The `llm-experiments/` collection expanded in 2026 and still needs project-specific security and reproducibility review. Its current location is not evidence that the same published files existed in 2024.
 
 ## Choose a reading path
 
 - **Origin and intent:** [The Ferryman Before the System](docs/prologue_pi_2023.md) → [Early Experiments](docs/00_prequel_experiments.md) → [Genesis](docs/01_genesis.md)
 - **Automation and failure:** [First Automation](docs/02_first_automation.md) → [Lessons Revisited](docs/05_lessons_learned.md) → [Production Reality Check](docs/11_production_reality_check.md)
 - **Aletheia and human control:** [Aletheia](docs/09_aletheia_local_agent.md) → [Current State](CURRENT_STATE.md)
-- **Architecture lineage:** [ACE Framework Exploration](docs/07_ace_framework_exploration.md) → [Pantheon: What I Kept from ACE](docs/14_pantheon_bounded_cognition.md)
+- **Architecture lineage:** [ACE Framework Exploration](docs/07_ace_framework_exploration.md) → [Pantheon Bounded Cognition](docs/14_pantheon_bounded_cognition.md)
 - **Local models and reliability:** [Early LLM Patterns](docs/08_early_llm_patterns.md) → [Bonsai 1-bit Deployment](docs/12_bonsai_1bit_local_deployment.md) → [When Agentic Research Needed Less Agency](docs/13_bounded_research_scripts.md)
 
 ## Practical agent-security guides
@@ -65,8 +65,8 @@ These guides turn the repository's later lessons into reviewable control pattern
 
 ## Current state
 
-**Snapshot:** 16 July 2026<br>
-**Repository review:** July 2026
+**Snapshot:** 16 August 2026<br>
+**Repository review:** August 2026
 
 [Current State](CURRENT_STATE.md) describes what I actually use now. Hermes Agent is the active harness for conversations, skills, tools, memory, scheduled work, and execution receipts. Aletheia continues as a persona and co-pilot role inside Hermes rather than as the standalone command-center application described in Chapter 09.
 
@@ -116,7 +116,7 @@ Older chapters did not always make these boundaries explicit. The July 2026 edit
 | [11 — Production Reality Check](docs/11_production_reality_check.md) | Feb 2026 | Infrastructure hardening and PDCA verification | Verified case-study snapshot |
 | [12 — Bonsai 1-bit Local Deployment](docs/12_bonsai_1bit_local_deployment.md) | Apr 2026 | AMD ROCm deployment and local benchmark | Single-machine case study |
 | [13 — When Agentic Research Needed Less Agency](docs/13_bounded_research_scripts.md) | Jul 2026 | Replacing brittle model-driven research crons with bounded scripts | Verified local case-study snapshot |
-| [14 — Pantheon: What I Kept from ACE](docs/14_pantheon_bounded_cognition.md) | Aug 2026 | How Pantheon differs from ACE and what a rejected extension showed | Current architecture note and bounded experiment report |
+| [14 — Pantheon Bounded Cognition](docs/14_pantheon_bounded_cognition.md) | Aug 2026 | How the bounded-cognition experiment differs from ACE and what a rejected extension showed | Bounded experiment note; separate from Pantheon Agent Room |
 
 ## Responsibility flow
 
@@ -159,7 +159,7 @@ Do not deploy excerpts unchanged in a sensitive environment.
 
 - [AI Agents Workshop](workshops/AI_Agents_Workshop_Outline.md) — revised public outline with exercises, evidence boundaries, and facilitator guardrails
 - [Training video](https://youtu.be/64qeuW15J8g) — unedited February 2026 presentation snapshot; later corrections live in Chapter 06 and the workshop outline
-- [Redefining Efficiency in AI](whitepapers/Redefining%20Efficiency%20in%20AI%20The%20Impact%20of%201.58-bit%20LLMs%20on%20the%20Future%20of%20Computing.pdf) — 2024 paper with a [2026 retrospective](whitepapers/1_58_bit_llm_retrospective_2026.md)
+- [Redefining Efficiency in AI](whitepapers/Redefining%20Efficiency%20in%20AI%20The%20Impact%20of%201.58-bit%20LLMs%20on%20the%20Future%20of%20Computing.pdf) — canonical 2026 re-export of the 2024 paper text, with an evidence-based [2026 retrospective](whitepapers/1_58_bit_llm_retrospective_2026.md)
 - [`GLyttek/myscripts`](https://github.com/GLyttek/myscripts) — public Python experiments and utilities
 
 External influences referenced in historical chapters include David Shapiro's [ACE Framework](https://github.com/daveshap/ACE_Framework), [OpenAI Agent Swarm / HAAS](https://github.com/daveshap/OpenAI_Agent_Swarm), and [GATO Framework](https://github.com/daveshap/GATO_Framework). `GOTCHA` was an internal security mnemonic, not an industry standard.
@@ -170,9 +170,10 @@ Run:
 
 ```bash
 python3 scripts/check_docs.py
+python3 scripts/check_docs.py --external
 ```
 
-The check validates local Markdown links and confirms that every numbered chapter is indexed here.
+The default check validates local Markdown links and confirms that every numbered chapter is indexed here. The optional external pass probes external Markdown links, treating confirmed 404/410 responses as failures and reporting access blocks or transient network errors separately.
 
 ## License
 

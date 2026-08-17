@@ -1,8 +1,9 @@
-# 14 — Pantheon: What I Kept from ACE
+# 14 — Pantheon Bounded Cognition: What I Kept from ACE
 
-> **Status:** Current architecture note and bounded experiment report. Pantheon is not a production system or an autonomous cognitive entity.
+> **Status:** Bounded-cognition architecture note and experiment report. This is separate from the later Pantheon Agent Room read-only Hermes Desktop project. Neither is a production system or an autonomous cognitive entity.
 
-**Date:** August 4, 2026
+**Date:** August 4, 2026<br>
+**Status distinction reviewed:** August 16, 2026
 
 I returned to David Shapiro's ACE diagram while reviewing Pantheon. Shapiro's public work was an important early influence on how I thought about autonomous systems. ACE gave me a useful vocabulary for separating values, strategy, self-knowledge, planning, task selection and execution before I had reliable software for any of them.
 
@@ -58,7 +59,7 @@ The strongest public implementation is the [`ACE_PRIME/HelloAF` demonstrator](ht
 
 ## Where Pantheon took a different path
 
-Pantheon is a set of named specialist roles, contracts, local evidence stores and host-side validation paths. Its current design keeps consequential authority outside the model hierarchy.
+The Pantheon bounded-cognition experiment is a set of named specialist roles, contracts, local evidence stores and host-side validation paths. Its design keeps consequential authority outside the model hierarchy.
 
 ```mermaid
 flowchart TB

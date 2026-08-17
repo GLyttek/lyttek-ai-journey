@@ -82,7 +82,7 @@ What carried forward was a working habit: build a small path end to end, inspect
 
 The [`GLyttek/myscripts`](https://github.com/GLyttek/myscripts) repository is publicly accessible and was created on 2 March 2024. Its first commits provide public evidence for local-model and API experiments from March and April 2024.
 
-The current [`llm-experiments`](https://github.com/GLyttek/myscripts/tree/main/llm-experiments) directory contains cleaned examples for MITRE extraction, RAG, security-awareness generation, YouTube retrieval, and simple tool patterns. That collection was added in February 2026. It is useful supporting material, but its present location should not be mistaken for proof that those exact cleaned files were public in 2024.
+The current [`llm-experiments`](https://github.com/GLyttek/myscripts/tree/main/llm-experiments) directory contains later examples for MITRE extraction, RAG, security-awareness generation, YouTube retrieval, and simple tool patterns. That collection was added in February 2026. It still contains rough implementation and security boundaries and should be read as learning material, not as a vetted reference implementation. Its present location is not proof that those exact files were public in 2024.
 
 Other early outputs and prototypes remain private because they contain rough code, local paths, obsolete security practices, or generated material that has not been cleared for publication.
 

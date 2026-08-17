@@ -18,27 +18,27 @@ Then PrismML shipped Bonsai.
 
 ## PrismML and the Q1_0_g128 Format
 
-PrismML took low-bit research into a deployable model and inference implementation. Their Bonsai series uses a custom, non-mainline format called `Q1_0_g128`:
+PrismML published a Bonsai model and inference implementation using a custom, non-mainline format called `Q1_0_g128`:
 
 - Every 128 weights share a single FP16 scale factor
 - Each binary weight selects `-scale` or `+scale`
-- Result: **1.125 bits per weight average**, with the scale factors providing just enough precision for coherent outputs
+- Result: **1.125 bits per weight average**, counting one sign bit plus the shared scale metadata
 
 External references: [Bonsai-8B model card](https://huggingface.co/prism-ml/Bonsai-8B-gguf) and [PrismML llama.cpp fork](https://github.com/PrismML-Eng/llama.cpp).
 
-Bonsai-8B — an 8.19 billion parameter model based on the Qwen3 architecture — compresses to **1.07 GiB**. For comparison, the same model in standard 4-bit quantization (Q4_K_M) would be roughly 5 GiB. In FP16, about 16 GiB.
+Bonsai-8B uses a Qwen3 architecture and has 8.19 billion parameters. Its model card reports **1.15 GB** of parameter memory, a **1.16 GB** GGUF file, and **16.38 GB** for the FP16 comparison.
 
-One gigabyte. For an 8B parameter model.
+That parameter-memory figure was the practical reason I wanted to test the deployment.
 
-The catch at the time of this deployment: Q1_0_g128 was not supported by the standard Ollama distribution or mainline llama.cpp. PrismML published a custom llama.cpp fork with the required kernels. “Custom” is the important distinction here; the public model and fork carry open-source licenses, so the original description of the whole stack as proprietary was too broad.
+At the time of this deployment, Q1_0_g128 was not supported by the standard Ollama distribution or mainline llama.cpp. PrismML published a custom llama.cpp fork with the required kernels. “Custom” is the important distinction here; the public model and fork carry open-source licenses, so the original description of the whole stack as proprietary was too broad.
 
 ## Why Not Just Use Ollama
 
-The first instinct was to download the GGUF from HuggingFace and pull it into Ollama. In this test, that path failed without a useful user-facing explanation.
+The first instinct was to download the GGUF from Hugging Face and pull it into Ollama. In this historical test, the import path created a model entry, but prompting produced unusable output or no output. The retained evidence did not isolate whether the failure occurred during import, format handling, or inference.
 
-Ollama downloads the file, creates a model entry, and appears to load it. When you send a prompt, you get garbage output — or no output at all. Ollama's backend is standard llama.cpp, which encounters the Q1_0_g128 quantization type and either errors out internally or misinterprets the weight layout.
+The support boundary is the defensible explanation: `Q1_0_g128` required PrismML's custom kernels and was not supported by the standard Ollama distribution or mainline llama.cpp used in this test. I should not infer a specific silent weight-layout failure from the user-visible symptom alone.
 
-The correct path is: PrismML's llama.cpp fork → compiled with GPU support → serving via `llama-server` → any OpenAI-compatible frontend on top. AnythingLLM fit the last requirement perfectly: it supports generic OpenAI endpoints, has built-in RAG, and runs as a Docker container.
+The path that worked in this test was: PrismML's llama.cpp fork → compiled with GPU support → serving via `llama-server` → an OpenAI-compatible frontend. I used AnythingLLM because it supported a generic OpenAI endpoint, included RAG features, and ran as a Docker container.
 
 ## The Build Plan
 
@@ -162,7 +162,7 @@ CMD ["--no-warmup", ...]
 
 `--no-warmup` skips the initial inference pass that llama.cpp runs at startup. The model loads faster, the healthcheck passes within 180 seconds, and AnythingLLM connects.
 
-## The Moment It Worked
+## The Observed Working Run
 
 After fix five, the sequence looked like this:
 
@@ -189,39 +189,39 @@ generation:  108 tokens/sec
 
 The server reported 108 tokens per second generation on this RX 6750 XT setup.
 
-My reaction, after all that was : *"It is alive!!"*
+My reaction, after all that, was: *"It is alive!!"*
 
-## Honest Model Evaluation
+## Small Qualitative Evaluation
 
-108 tokens per second creates a certain enthusiasm. It's worth grounding that with an honest capability assessment.
+The throughput result was useful, but it did not measure model quality. The following observations came from a small number of prompts and one uploaded document, without a comparison set or blinded review.
 
-### What Bonsai-8B Does Well
+### Language output in the prompts I tried
 
-**Language and reasoning tasks** are strong. The model explains concepts clearly, maintains context across a conversation, and writes grammatically correct output in both German and English. When asked to reflect on the philosophical implications of 1-bit quantization — whether something is lost when a weight can only be -1, 0, or +1 — it produced a thoughtful, multi-paragraph response about the nature of information compression and the difference between precision and meaning.
+The model produced clear German and English prose in the prompts I tried. In one discussion about low-bit compression, it returned a coherent multi-paragraph response. That shows the model could generate useful language in that interaction; it does not establish general reasoning ability or stable long-context behavior.
 
-**RAG document analysis** was promising in a small qualitative test. We uploaded a 15-page German business document on AI readiness for SMEs. The model produced a useful summary, extracted recommendations, and identified the intended audience without additional prompt engineering. This was a single author assessment, not a blinded comparison against human analysts.
+**RAG document analysis** was useful in one small qualitative test. I uploaded a 15-page German business document on AI readiness for SMEs. The model produced a summary, extracted recommendations, and identified the intended audience without additional prompt engineering. This was one author's assessment, not a blinded comparison against human analysts or other models.
 
-### Where It Struggles
+### One reasoning failure
 
-**Arithmetic** is unreliable. We tested with a lateral thinking question: a man leaves shirts out to dry, some dry in 1 hour, some take longer depending on placement. How long does everything take to dry?
+I tested a lateral-thinking question: a man leaves shirts out to dry, some dry in one hour, and the question asks how long everything takes to dry.
 
-The model calculated **3.33 hours**. The correct answer requires noticing that all items dry simultaneously (it's a lateral thinking trick, not a calculation problem). A standard reasoning chain would catch this. Bonsai-8B did not.
+The model calculated **3.33 hours**. The expected answer treats the items as drying simultaneously; Bonsai-8B did not reach that answer in this prompt.
 
-One failed lateral-thinking prompt does not establish a general arithmetic limitation or its cause. The result is recorded as a local observation; a defensible capability claim would require a repeatable evaluation set and comparison models.
+One failed lateral-thinking prompt does not establish a general arithmetic or reasoning limitation, and the prompt is not an arithmetic benchmark. A defensible capability claim would require a repeatable evaluation set and comparison models.
 
-### A Context-Contamination Hypothesis
+### Context history as a possible variable
 
-This was the most interesting discovery of the evaluation.
+This observation made context history a variable for a future test.
 
-We tested a multi-step math puzzle in a chat thread that had already covered several other topics. The model gave a wrong answer. We then opened a **fresh chat thread** and asked the same question. The model answered correctly.
+I tested a multi-step math puzzle in a chat thread that had already covered several other topics. The model gave a wrong answer. I then opened a **fresh chat thread** and asked the same question. The model answered correctly.
 
-Same model. Same weights. Different context window history.
+The model and weights were unchanged; the context-window history differed.
 
 One plausible hypothesis is that previous turns changed the effective task and attention context. The observation does not isolate causality: sampling variation, chat templates, and frontend behavior could also contribute.
 
-Practical recommendation: **prefer fresh contexts for independent analytical tasks**, then evaluate whether this improves results on a repeatable task set. For conversational tasks, continuity may be part of the requirement.
+This is a reason to control context history in a repeatable evaluation, not a workflow rule derived from two prompts.
 
-**Verdict from this test**: Bonsai-8B was deployable on the documented consumer hardware and useful for selected language and document tasks. The test does not establish that it was the first production 1-bit model, that its quality generalizes, or that arithmetic weakness is inherent to the format. It is better understood as a fast local model with unusually low parameter memory and task-dependent capability.
+**Verdict from this test**: Bonsai-8B was deployable on the documented consumer hardware and produced useful output in selected language and document prompts. The test does not establish that it was the first production 1-bit model, that its quality generalizes, or that the observed reasoning failure is inherent to the format. It is a local deployment result with unusually low reported parameter memory and a quality question that still needs controlled evaluation.
 
 ## The Docker Setup Used for This Test
 
@@ -312,39 +312,39 @@ docker compose up --build
 
 ## Credit Where It's Due
 
-The BitNet b1.58 research showed that 1-bit training was theoretically possible. PrismML turned that into Bonsai: a real model, a real quantization format, a real llama.cpp fork with working HIP kernels. The gap between "interesting paper" and "running on your GPU in a Docker container" is substantial, and they bridged it.
+The BitNet b1.58 paper documented a ternary low-bit training approach. PrismML later published Bonsai with a different binary sign-plus-scale format and a llama.cpp fork with HIP kernels. This chapter records that their public artifacts produced a working local deployment on the documented machine; it does not claim that Bonsai is an implementation of BitNet b1.58.
 
-The `HSA_OVERRIDE_GFX_VERSION=10.3.0` trick, the dual `gfx1031;gfx1030` build target, the `hipblas-dev` dependency that the base image omits — none of these are documented anywhere in a single place. They're scattered across GitHub issues, ROCm forums, and AMD hardware compatibility tables. Debugging them required understanding the GPU stack from the driver level (HSA) through the compute library (rocBLAS/Tensile) to the build system (cmake -DAMDGPU_TARGETS).
+I did not find one source that covered the `HSA_OVERRIDE_GFX_VERSION=10.3.0` workaround, the dual `gfx1031;gfx1030` build target, and the `hipblas-dev` dependency together. I assembled the path from the observed errors and separate ROCm, build, and community references. The result should therefore be treated as a dated compatibility receipt, not a general AMD deployment recipe.
 
 That debugging is the actual work. The Dockerfile is only 42 lines. The knowledge that makes those 42 lines correct took considerably longer to acquire.
 
 ## Reflections
 
-### On 1-Bit as a Category Shift
+### Distinguishing BitNet, Bonsai, and 4-bit quantization
 
-There's a meaningful difference between a 4-bit quantized model and a 1-bit model. Both are compressed. But a 4-bit model is still fundamentally a reduced-precision floating point representation — the original weight structure is intact, just approximated. A 1-bit model trained natively is something else: a sparse, ternary weight matrix where each parameter encodes a direction (-1/+1) or silence (0). It's closer to a binary decision tree than to a neural network in the classical sense.
+BitNet b1.58 uses ternary weights `{-1, 0, 1}`. The Bonsai model card instead describes binary sign choices with one FP16 scale shared by each group of 128 weights, yielding 1.125 effective bits per weight. Common 4-bit formats encode a larger set of quantized values plus scaling metadata. These are different numerical representations and kernel requirements.
 
-Whether this architectural difference matters for capability — beyond the currently observed arithmetic weakness — remains an open research question. The fact that 1-bit models work at all for language tasks is still surprising if you think about it carefully.
+None of them changes the model into a decision tree. Bonsai remains a neural Transformer model. This deployment also cannot attribute a capability difference to bit width because it did not compare matched models, training runs, or quantizations.
 
 ### On the GPU as Infrastructure
 
 In this run, the server reported 108 tokens per second from a 12 GB consumer GPU with about 1 GB of parameter memory, served through an OpenAI-compatible HTTP API with a local RAG frontend. After images and model files were downloaded, inference could run without a cloud-model API. Loopback binding and local authentication still matter even in that configuration.
 
-The same class of experiment has become much more accessible on consumer hardware. The short Compose file hides the time spent resolving driver, kernel, model-format, and container-integration details.
+This setup made the experiment possible on the documented consumer hardware. The short Compose file hides the time spent resolving driver, kernel, model-format, and container-integration details.
 
-The infrastructure story of local AI is not “it is as good as the cloud” at the top end. The local observation is narrower: a model with about 1 GB of parameter memory produced useful language and document output at high reported throughput on this system. That is enough to justify further controlled evaluation without turning one run into a universal benchmark.
+This experiment did not compare the local setup with leading cloud models. It showed that a model with about 1 GB of parameter memory produced useful language and document output at the reported throughput on this system. That result justifies further controlled evaluation, not a universal benchmark claim.
 
-### On Context Contamination as Design Information
+### Testing context history
 
 The fresh-thread observation is not yet a general finding. It is a useful hypothesis for workflow design and evaluation.
 
-For batch analysis tasks (processing documents, answering independent questions), each task should get a fresh context window. For conversational tasks where continuity is the feature, the accumulated context is doing useful work.
+For a future batch evaluation, I would start each independent case in a fresh context and compare that condition with accumulated conversation history. Conversational tasks need a separate condition because continuity may be part of the requirement.
 
-Most chat UIs default to one long thread. For analytical work, that's the wrong default. This is worth building into workflow design explicitly.
+The two prompts observed here do not prove that long chat threads are generally the wrong default. They identify context history as a variable that the next evaluation should control.
 
 ---
 
-*Credit and gratitude: the Bonsai models and Q1_0_g128 quantization format are the work of PrismML. The underlying 1.5-bit research originates from Microsoft Research's BitNet b1.58 paper. This chapter documents the deployment process, not any original model work.*
+*Credit and gratitude: the Bonsai models and Q1_0_g128 quantization format are the work of PrismML. The BitNet b1.58 paper referenced here was published by Microsoft Research authors. This chapter documents the deployment process, not any original model work.*
 
 ---
 
