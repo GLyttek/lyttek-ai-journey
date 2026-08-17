@@ -104,7 +104,7 @@ The patterns did not become a production system exactly as drawn. They became qu
 - Can deterministic code perform this step more reliably?
 - Which context is durable, and who can inspect or correct it?
 
-Cleaned examples are available in [`GLyttek/myscripts/llm-experiments`](https://github.com/GLyttek/myscripts/tree/main/llm-experiments). That directory was added in February 2026. It documents the pattern family but is not evidence that those exact cleaned files were public during the 2024–2025 experiments.
+Later examples are available in [`GLyttek/myscripts/llm-experiments`](https://github.com/GLyttek/myscripts/tree/main/llm-experiments). That directory was added in February 2026 and still needs project-specific security and reproducibility review. It documents the pattern family but is not evidence that those exact files were public during the 2024–2025 experiments.
 
 The value of the early work was not that the recipes were correct. It was that they made the missing controls visible.
 

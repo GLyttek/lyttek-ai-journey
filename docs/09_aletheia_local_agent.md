@@ -1,7 +1,7 @@
 # 09 — Aletheia: From Standalone Agent to Co-Pilot Role
 
 > **Historical build:** February 2026<br>
-> **Editorial note, July 2026:** The standalone Aletheia application described here is archived. Aletheia now operates as a persona and co-pilot role inside Hermes Agent. This revision removes marketing language, narrows autonomy claims, and records the security findings and transition without rewriting the historical prototype as if it were the current system.
+> **Editorial note, updated August 2026:** The standalone Aletheia application described here is archived. Aletheia now operates as a persona and co-pilot role inside Hermes Agent. Pantheon bounded cognition and Pantheon Agent Room are later, separate experiments; neither turns Aletheia into an autonomous authority. This revision narrows autonomy claims and records the transition without rewriting the historical prototype as if it were the current system.
 
 The first automation workspace optimized movement: collect an item, classify it, process it, and route the output. It did not address the reason I had been drawn to conversational AI in the first place.
 
@@ -128,6 +128,8 @@ Aletheia continued as the co-pilot role:
 
 This change reduced custom orchestration. It did not outsource responsibility to the harness. Hermes also requires configuration, capability review, data boundaries, and verification. [Current State](../CURRENT_STATE.md) records the current limits, including incomplete DLP coverage, prompt-injection risk, and the absence of a universal local-versus-cloud router.
 
+In August 2026 I also started a separate Pantheon Agent Room feasibility project for read-only visibility into existing Hermes sessions and subagents. It is not the Pantheon bounded-cognition architecture described in Chapter 14, and its Room-0 boundary deliberately excludes dispatch, memory changes, Cron changes, publishing, and consequential tool use.
+
 ## What Aletheia became
 
 The February application asked whether a personal agent could improve the quality of thinking rather than only increase throughput. That question survived the software that first carried it.
@@ -136,7 +138,7 @@ I do not describe Aletheia as an independent being with an intrinsic interest in
 
 The name still matters because it sets a demand: uncover what is true, including what the system and its user would prefer not to see.
 
-The ferryman did not need its own harbor. It needed a reliable boat, visible boundaries, and a human who remained responsible for the destination.
+The role survived because it could move into a different harness without moving responsibility with it. Instructions, evidence rules, permissions, and my review remain the operative boundary.
 
 ---
 

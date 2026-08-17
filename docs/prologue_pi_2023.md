@@ -131,8 +131,8 @@ Quoted passages are short excerpts from messages I wrote. Pi’s responses are p
 Product context is based on Inflection AI’s own historical announcements:
 
 - [Introducing Pi, Your Personal AI — 2 May 2023](https://inflection.ai/blog/pi)
-- [Pi: everywhere you are! — 14 March 2024](https://inflection.ai/blog/pi-is-available-wherever-you-are)
-- [The new Inflection — 19 March 2024](https://inflection.ai/blog/the-new-inflection)
+- [Pi: everywhere you are! — 14 March 2024](https://web.archive.org/web/20241107172050/https://inflection.ai/blog/pi-is-available-wherever-you-are) — archived first-party page; the original URL now returns 404
+- [The new Inflection — 19 March 2024](https://web.archive.org/web/20240919155129/https://inflection.ai/blog/the-new-inflection) — archived first-party page; the original URL now returns 404
 - [The Future of Pi — 26 August 2024](https://inflection.ai/blog/the-future-of-pi)
 
 These are first-party descriptions of the product and company direction, not independent measures of quality, safety, or market position. The comparison with ChatGPT’s public visibility is my interpretation.

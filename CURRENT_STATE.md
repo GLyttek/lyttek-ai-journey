@@ -1,6 +1,7 @@
 # Current State
 
-*Snapshot: July 16, 2026*
+*Snapshot: August 16, 2026*<br>
+*Repository review: August 16, 2026*
 
 This page describes what I actually use today. It does not rewrite the earlier chapters. Those chapters remain dated records of what I built, believed, tested, and later changed.
 
@@ -40,16 +41,20 @@ I want to make it very clear that no model is free of ideological or institution
 | **Local inference** | Test environment and possible specialist or privacy-preserving execution path | Ollama and Docker Model Runner are available; local inference is not currently the demonstrated core of the recurring workflows |
 | **Security and threat-intelligence work** | Learning, source screening, awareness, and local triage | Active as bounded research workflows; not a production SOC or autonomous response system |
 | **Publishing workflow** | Drafting, local review, backup, controlled upload, and post-upload verification for lyttek.org | Used in practice; manually controlled and backed up, not a CI/CD pipeline |
+| **Pantheon bounded cognition** | Manual and isolated specialist contracts, evidence paths, and rejection tests | Bounded experiment; no autonomous chain or production deployment |
+| **Pantheon Agent Room** | Read-only Hermes Desktop project for visualizing existing sessions and subagents without granting dispatch authority | Active feasibility project; static read-only contract verified, event and visual tests still incomplete |
 
-## Pantheon architecture addendum — August 4, 2026
+## Two Pantheon artifacts, not one system
 
-The [Pantheon architecture note](docs/14_pantheon_bounded_cognition.md) revisits the earlier ACE experiment against pinned public snapshots of ACE, OpenAI Agent Swarm/HAAS, and Sparse Priming Representations.
+The [Pantheon bounded-cognition note](docs/14_pantheon_bounded_cognition.md) revisits the earlier ACE experiment against pinned public snapshots of ACE, OpenAI Agent Swarm/HAAS, and Sparse Priming Representations.
 
-Pantheon currently has bounded technical evidence for six specialist paths and a local evidence layer. It does **not** run as one autonomous production chain. Routing remains advisory, consequential action remains separately approved, and general human utility remains unproven.
+That experiment has bounded technical evidence for six specialist paths and a local evidence layer. It does **not** run as one autonomous production chain. Routing remains advisory, consequential action remains separately approved, and general human utility remains unproven.
 
 A candidate frame-audit extension was frozen, tested once against a sealed public synthetic holdout, and not integrated after failing its semantic acceptance criteria. The retained result documents a rejection process; it does not establish production readiness or downstream benefit.
 
-The next measurable tests are a versioned strategy brief, a live capability snapshot, a privilege-lineage receipt, a recovery exercise, and a source-bound sparse-priming comparison.
+Pantheon Agent Room is a separate Hermes Desktop project. Its Room-0 contract is intentionally read-only: observe existing sessions and subagents, but do not dispatch agents, change memory or Cron, accept suggestions, publish, or invoke consequential tools. The current plugin shape and static read-only boundary pass an isolated VM test. Robust event fixtures, a manual visual receipt, and an official focused project/session-history query are still missing.
+
+Neither artifact grants authority to the other. The shared name records a design lineage, not one completed platform.
 
 ## What changed from the earlier chapters
 
@@ -175,6 +180,8 @@ The next useful work is not another large architecture diagram. It is evidence:
 - define tool capabilities and approval boundaries more systematically;
 - test how well the co-pilot surfaces counter-evidence instead of reinforcing my assumptions;
 - improve experiment records so failed paths are as easy to find as successful ones;
+- add defensive event-shape tests and a visual receipt for Pantheon Agent Room before publishing it as an executable example;
+- keep the bounded-cognition experiment and Agent Room documentation separate;
 - review this page when the active harness, data boundary, or approval model changes.
 
-This snapshot supersedes the README's older description of the current runtime. It does not supersede the historical chapters as records of the journey.
+This snapshot and the README now describe the same current runtime. Neither supersedes the historical chapters as records of the journey.
